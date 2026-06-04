@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Mail, Lock, EyeOff } from "lucide-react";
@@ -12,11 +13,48 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useState } from "react";
+import { useLogin } from "@/server/hooks/useLogin";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const router = useRouter();
+
+  const loginMutation = useLogin();
+
+  const handleLogin = () => {
+    loginMutation.mutate(
+      {
+        email,
+        password,
+      },
+      {
+        onSuccess: (response) => {
+          if (response.data.user.role === "Admin") {
+            router.push("/admin");
+          } else {
+            router.push("/");
+          }
+        },
+      },
+    );
+  };
+
   return (
-    <main className="min-h-screen bg-[#f3f3f3] flex items-center justify-center p-6">
-      <Card className="w-full max-w-6xl flex flex-row overflow-hidden rounded-md shadow-md border-0">
+    <main className="min-h-screen bg-[#F7E8E8] flex items-center justify-center p-6">
+      <Card
+        className={`relative w-full max-w-6xl flex flex-row overflow-hidden rounded-md shadow-md border-0 ${
+          loginMutation.isPending ? "animate-pulse" : ""
+        }`}
+      >
+        {loginMutation.isPending && (
+          <div className="absolute top-0 left-0 h-1 w-full overflow-hidden bg-gray-200">
+            <div className="h-full w-1/3 bg-blue-500 animate-loading-bar" />
+          </div>
+        )}
         {/* Left Side */}
         <div className="w-1/2 flex flex-col items-center justify-center p-16">
           <Image
@@ -51,18 +89,34 @@ export default function Home() {
             </div>
 
             <div className="w-full max-w-md p-6 space-y-6">
-              <FloatingInput label="Email Address" icon={<Mail size={24} />} />
+              <FloatingInput
+                label="Email Address"
+                icon={<Mail size={24} />}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
 
               <FloatingInput
                 label="Password"
                 type="password"
                 icon={<Lock size={24} />}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+            <div>
+              {loginMutation.isError && (
+                <p className="text-red-500">{loginMutation.error?.message}</p>
+              )}
             </div>
 
             <div className="w-full flex flex-col items-center ">
-              <Button className="w-3/4 h-10 bg-red-600 hover:bg-red-800 font-bold text-xl">
-                Sign In
+              <Button
+                className="w-3/4 h-10 bg-red-600 hover:bg-red-800 font-bold text-xl"
+                onClick={handleLogin}
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "Signing In..." : "Sign In"}
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
