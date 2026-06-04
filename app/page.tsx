@@ -33,6 +33,7 @@ export default function Home() {
       },
       {
         onSuccess: (response) => {
+          localStorage.setItem("token", response.data.token);
           if (response.data.user.role === "Admin") {
             router.push("/admin");
           } else {
