@@ -62,16 +62,16 @@ export default function Sidebar({ menu }: SidebarProps) {
       </nav>
 
       {/* System Status Footer */}
-      <div className=" absolute w-full p-6 bg-red-950 border-t border-white/5 bottom-0">
-        <div className="flex items-center gap-3 mb-4">
+      <div className=" absolute w-full pt-6 pb-6  bg-red-950 border-t border-white/5 bottom-0">
+        <div className="flex items-center gap-3 mb-4 ml-6">
           <div className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-white">
+          <span className="text-[10px]  font-black uppercase tracking-widest text-white">
             System Online
           </span>
         </div>
-        <p className="text-[9px] font-bold text-white/50 uppercase">
-          © 2026 ISHABELLA CORP
-        </p>
+        <div className="w-full">
+          <img src="/assets/hall.png" alt="" className="w-full" />
+        </div>
       </div>
     </aside>
   );
