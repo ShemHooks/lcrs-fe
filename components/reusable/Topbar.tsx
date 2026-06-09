@@ -2,13 +2,25 @@
 
 import { Bell, User, LogOut, ChevronRight, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { getProfile } from "@/server/hooks/authHooks";
 
 export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data, isLoading, isError, error } = getProfile();
 
   const currentPath =
     pathname.split("/").pop()?.replace(/-/g, " ") || "Dashboard";
+
+  if (isLoading) {
+    return <p>...Loading</p>;
+  }
+
+  if (isError) {
+    return <div>Error loading user</div>;
+  }
+
+  console.log(data.data.username);
 
   return (
     <header className="bg-white border-b border-emerald-900/5 h-16 flex justify-between items-center px-8 sticky top-0 z-40">
@@ -38,10 +50,10 @@ export default function Topbar() {
         <div className="flex items-center gap-4 group cursor-pointer">
           <div className="text-right">
             <p className="text-[10px] font-black uppercase tracking-widest text-black-900/80">
-              Admin Chief
+              {data.data.username}
             </p>
             <p className="text-[9px] font-bold text-red-800/80 uppercase tracking-tighter">
-              Verified User
+              {data.data.role}
             </p>
           </div>
 

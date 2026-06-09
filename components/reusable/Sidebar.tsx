@@ -15,7 +15,7 @@ export default function Sidebar({ menu }: SidebarProps) {
   return (
     <aside className="w-64 bg-red-900 text-white h-screen flex flex-col fixed border-r border-white/5">
       {/* Brand Header Section */}
-      <div className="p-4 h-1/8 flex gap-2 border-b border-white/">
+      <div className="p-4 h-1/8 flex  gap-2 border-b border-white/">
         <img
           src="/assets/CCRO.png"
           alt="Ishabella Logo"
@@ -50,7 +50,7 @@ export default function Sidebar({ menu }: SidebarProps) {
 
               <Icon
                 size={20}
-                className={`${active ? "text-white" : "group-hover:text-emerald-400"} transition-colors`}
+                className={`${active ? "text-white" : "group-hover:text-red-400"} transition-colors`}
               />
 
               <span className="text-xs font-black uppercase tracking-widest">
@@ -62,7 +62,7 @@ export default function Sidebar({ menu }: SidebarProps) {
       </nav>
 
       {/* System Status Footer */}
-      <div className=" absolute w-full pt-6 pb-6  bg-red-950 border-t border-white/5 bottom-0">
+      <div className=" absolute w-full pl-2 pr-2 pt-6 pb-6  bg-red-950 border-t border-white/5 bottom-0">
         <div className="flex items-center gap-3 mb-4 ml-6">
           <div className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
           <span className="text-[10px]  font-black uppercase tracking-widest text-white">

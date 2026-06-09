@@ -6,11 +6,13 @@ import { Eye, EyeOff } from "lucide-react";
 interface FloatingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   icon?: React.ReactNode;
+  iconPosition?: "left" | "right";
 }
 
 export function FloatingInput({
   label,
   icon,
+  iconPosition = "left",
   type = "text",
   ...props
 }: FloatingInputProps) {
@@ -21,17 +23,22 @@ export function FloatingInput({
   return (
     <div className="relative">
       {icon && (
-        <div className="absolute left-0 top-4 text-gray-500">{icon}</div>
+        <div
+          className={`absolute top-4 text-gray-500 ${
+            iconPosition === "left" ? "left-0" : "right-0 mr-2"
+          }`}
+        >
+          {icon}
+        </div>
       )}
 
       <input
         type={isPassword ? (showPassword ? "text" : "password") : type}
         placeholder=" "
-        className="
+        className={`
           peer
           w-full
-          pl-12
-          pr-12
+          ${iconPosition === "left" ? "pl-12 pr-12" : "pl-4 pr-12"}
           pt-6
           pb-2
           border-0
@@ -40,14 +47,14 @@ export function FloatingInput({
           bg-transparent
           outline-none
           focus:border-blue-500
-        "
+        `}
         {...props}
       />
 
       <label
-        className="
+        className={`
           absolute
-          left-12
+          ${iconPosition === "left" ? "left-12" : "left-4"}
           top-4
           text-gray-500
           pointer-events-none
@@ -58,7 +65,7 @@ export function FloatingInput({
           peer-focus:text-blue-500
           peer-[:not(:placeholder-shown)]:top-1
           peer-[:not(:placeholder-shown)]:text-xs
-        "
+        `}
       >
         {label}
       </label>

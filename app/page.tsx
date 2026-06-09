@@ -14,7 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useLogin } from "@/server/hooks/useLogin";
+import { useLogin } from "@/server/hooks/authHooks";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -95,6 +95,7 @@ export default function Home() {
                 icon={<Mail size={24} />}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                iconPosition="left"
               />
 
               <FloatingInput
@@ -103,6 +104,7 @@ export default function Home() {
                 icon={<Lock size={24} />}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                iconPosition="left"
               />
             </div>
             <div>
