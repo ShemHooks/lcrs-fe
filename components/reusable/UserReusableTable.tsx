@@ -41,7 +41,7 @@ const UserReusableTable = ({ users }: Props) => {
       </TableHeader>
       <TableBody>
         {users.map((user) => (
-          <TableRow key={user._id}>
+          <TableRow key={user.id}>
             <TableCell>
               {user.first_name} {user.last_name}
             </TableCell>

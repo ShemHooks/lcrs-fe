@@ -7,6 +7,7 @@ interface createUserTypes {
   email: string;
   password: string;
   isActive: boolean;
+  role: string;
 }
 
 export const getAllUser = async (
@@ -33,6 +34,6 @@ export const createUser = async (payload: createUserTypes) => {
     const response = await api.post("/api/users", payload);
     return response.data;
   } catch (error: any) {
-    throw error.data;
+    throw error;
   }
 };
