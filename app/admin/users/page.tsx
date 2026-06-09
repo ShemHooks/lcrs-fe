@@ -7,6 +7,7 @@ import UserReusableTable from "@/components/reusable/UserReusableTable";
 import TableControl from "@/components/reusable/TableControl";
 import { useUsers } from "@/server/hooks/userHooks";
 import AddUserModal from "@/components/modal/AddUserModal";
+import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 
@@ -16,7 +17,11 @@ const page = () => {
   const [search, setSearch] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
-  const { data, isLoading } = useUsers(page, limit, search);
+  const router = useRouter();
+
+  const [isActive, setIsActive] = useState(true);
+
+  const { data, isLoading } = useUsers(page, limit, search, isActive);
 
   return (
     <div>
@@ -32,7 +37,10 @@ const page = () => {
             >
               <UserPlus /> Add User
             </Button>
-            <Button className="bg-red-500 hover:bg-red-600 text-white p-4.5">
+            <Button
+              className="bg-red-500 hover:bg-red-600 text-white p-4.5"
+              onClick={() => setIsActive(!isActive)}
+            >
               {" "}
               <List /> View Archive Users{" "}
             </Button>
@@ -46,7 +54,10 @@ const page = () => {
           />
 
           <div>
-            <UserReusableTable users={data?.data.users || []} />
+            <UserReusableTable
+              users={data?.data.users || []}
+              isActive={isActive}
+            />
           </div>
           <TableControl page={page} setPage={setPage} />
         </Card>

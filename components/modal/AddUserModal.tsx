@@ -192,7 +192,7 @@ const AddUserModal = ({ open, onOpenChange }: Props) => {
                   <SelectContent>
                     <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Staff">Clerk</SelectItem>
-                    <SelectItem value="Responder">Viewer</SelectItem>
+                    <SelectItem value="Reviewer">Reviewer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
