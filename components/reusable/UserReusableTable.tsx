@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -36,6 +36,8 @@ import {
   useDeleteUser,
 } from "@/server/hooks/userHooks";
 
+import UpdateUserModal from "../modal/UpdateUserModal";
+
 interface Props {
   users: User[];
   isActive: boolean;
@@ -45,6 +47,12 @@ const UserReusableTable = ({ users, isActive }: Props) => {
   const deactivatedMutation = useDeactivateUser();
   const activateMutation = useActivateUser();
   const deleteUserMutation = useDeleteUser();
+
+  const [sortColumn, setSortColumn] = useState<keyof User | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
 
   const handleDeactivate = (id: string) => {
     deactivatedMutation.mutate(id);
@@ -58,16 +66,80 @@ const UserReusableTable = ({ users, isActive }: Props) => {
     deleteUserMutation.mutate(id);
   };
 
+  const handleSort = (column: keyof User) => {
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedUsers = useMemo(() => {
+    const sorted = [...users];
+
+    if (!sortColumn) return sorted;
+
+    sorted.sort((a, b) => {
+      const valueA = a[sortColumn];
+      const valueB = b[sortColumn];
+
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return sortDirection === "asc"
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      }
+
+      if (typeof valueA === "boolean" && typeof valueB === "boolean") {
+        return sortDirection === "asc"
+          ? Number(valueA) - Number(valueB)
+          : Number(valueB) - Number(valueA);
+      }
+
+      return 0;
+    });
+
+    return sorted;
+  }, [users, sortColumn, sortDirection]);
+
+  const handleUpdate = (id: string) => {
+    setSelectedUserId(id);
+    setUpdateModalOpen(true);
+  };
+
   return (
     <Table>
+      <UpdateUserModal
+        open={updateModalOpen}
+        onOpenChange={setUpdateModalOpen}
+        userId={selectedUserId}
+      />
       <TableHeader className="bg-gray-100/40">
         <TableRow>
-          <TableHead className="font-medium text-gray-500/80">USER</TableHead>
-          <TableHead className="font-medium text-gray-500/80">
+          <TableHead
+            className="font-medium text-gray-500/80 cursor-pointer"
+            onClick={() => handleSort("first_name")}
+          >
+            USER
+          </TableHead>
+          <TableHead
+            className="font-medium text-gray-500/80 cursor-pointer"
+            onClick={() => handleSort("username")}
+          >
             USERNAME
           </TableHead>
-          <TableHead className="font-medium text-gray-500/80">EMAIL</TableHead>
-          <TableHead className="font-medium text-gray-500/80">ROLE</TableHead>
+          <TableHead
+            className="font-medium text-gray-500/80 cursor-pointer"
+            onClick={() => handleSort("email")}
+          >
+            EMAIL
+          </TableHead>
+          <TableHead
+            className="font-medium text-gray-500/80 cursor-pointer"
+            onClick={() => handleSort("role")}
+          >
+            ROLE
+          </TableHead>
           <TableHead className="font-medium text-gray-500/80">STATUS</TableHead>
           <TableHead className="font-medium text-gray-500/80">
             ACTIONS
@@ -75,7 +147,7 @@ const UserReusableTable = ({ users, isActive }: Props) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map((user) => (
+        {sortedUsers.map((user) => (
           <TableRow key={user.id}>
             <TableCell>
               {user.first_name} {user.last_name}
@@ -90,7 +162,11 @@ const UserReusableTable = ({ users, isActive }: Props) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SquarePen size={20} className="cursor-pointer" />
+                        <SquarePen
+                          size={20}
+                          className="cursor-pointer"
+                          onClick={() => handleUpdate(user.id)}
+                        />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Update User Info</p>

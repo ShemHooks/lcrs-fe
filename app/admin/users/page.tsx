@@ -16,12 +16,13 @@ const page = () => {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [role, setRole] = useState("");
 
   const router = useRouter();
 
   const [isActive, setIsActive] = useState(true);
 
-  const { data, isLoading } = useUsers(page, limit, search, isActive);
+  const { data, isLoading } = useUsers(page, limit, search, isActive, role);
 
   return (
     <div>
@@ -51,6 +52,8 @@ const page = () => {
             setSearch={setSearch}
             limit={limit}
             setLimit={setLimit}
+            role={role}
+            setRole={setRole}
           />
 
           <div>

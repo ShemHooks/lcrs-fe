@@ -5,6 +5,8 @@ import {
   deactivateUser,
   activateUser,
   deleteUser,
+  getUserByID,
+  updateUserData,
 } from "../api/UserManagement";
 
 export const useUsers = (
@@ -12,10 +14,11 @@ export const useUsers = (
   limit: number,
   search: string,
   isActive: boolean,
+  role: string,
 ) => {
   return useQuery({
-    queryKey: ["users", page, limit, search, isActive],
-    queryFn: () => getAllUser(page, limit, search, isActive),
+    queryKey: ["users", page, limit, search, isActive, role],
+    queryFn: () => getAllUser(page, limit, search, isActive, role),
   });
 };
 
@@ -70,6 +73,31 @@ export const useDeleteUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["users"],
+      });
+    },
+  });
+};
+
+export const useUserByID = (id: string) => {
+  return useQuery({
+    queryKey: ["user", id],
+    queryFn: () => getUserByID(id),
+    enabled: !!id,
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateUserData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
       });
     },
   });
