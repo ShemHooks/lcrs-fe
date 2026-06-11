@@ -2,7 +2,7 @@
 
 import Topbar from "../reusable/Topbar";
 import Sidebar from "../reusable/Sidebar";
-import { adminMenu } from "@/lib/menu/AdminMenu";
+import { clerkMenu } from "@/lib/menu/ClerkMenu";
 
 export default function ClerkLayout({
   children,
@@ -11,7 +11,7 @@ export default function ClerkLayout({
 }) {
   return (
     <div className="flex">
-      <Sidebar menu={adminMenu} />
+      <Sidebar menu={clerkMenu} />
 
       <div className="flex-1 flex flex-col pl-64">
         <Topbar />

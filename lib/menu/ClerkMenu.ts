@@ -8,7 +8,7 @@ import {
   Download,
 } from "lucide-react";
 
-export const adminMenu = [
+export const clerkMenu = [
   {
     name: "Dashboard",
     path: "/admin/dashboard",
