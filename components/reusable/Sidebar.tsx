@@ -14,7 +14,6 @@ export default function Sidebar({ menu }: SidebarProps) {
 
   return (
     <aside className="w-64 bg-red-900 text-white h-screen flex flex-col fixed border-r border-white/5">
-      {/* Brand Header Section */}
       <div className="p-4 h-1/8 flex  gap-2 border-b border-white/">
         <img
           src="/assets/CCRO.png"
@@ -27,7 +26,6 @@ export default function Sidebar({ menu }: SidebarProps) {
         </div>
       </div>
 
-      {/* Navigation Section */}
       <nav>
         {menu.map((item) => {
           const Icon = item.icon;
@@ -43,7 +41,6 @@ export default function Sidebar({ menu }: SidebarProps) {
                   : "text-emerald-100/100 hover:bg-white/5 hover:text-white"
               }`}
             >
-              {/* Active Indicator Accent */}
               {active && (
                 <div className="absolute right-0 w-1 h-full bg-white " />
               )}
@@ -61,7 +58,6 @@ export default function Sidebar({ menu }: SidebarProps) {
         })}
       </nav>
 
-      {/* System Status Footer */}
       <div className=" absolute w-full pl-2 pr-2 pt-6 pb-6  bg-red-950 border-t border-white/5 bottom-0">
         <div className="flex items-center gap-3 mb-4 ml-6">
           <div className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />

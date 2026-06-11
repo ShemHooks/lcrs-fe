@@ -36,6 +36,8 @@ export default function Home() {
           sessionStorage.setItem("token", response.data.token);
           if (response.data.user.role === "Admin") {
             router.push("/admin");
+          } else if (response.data.user.role === "Staff") {
+            router.push("/clerk");
           } else {
             router.push("/");
           }

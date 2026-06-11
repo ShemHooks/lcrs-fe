@@ -26,10 +26,10 @@ const page = () => {
 
   return (
     <div>
-      <div>
+      {/* <div>
         <h1 className="font-bold text-lg text-gray-600">User Management</h1>
-      </div>
-      <div className="pt-6">
+      </div> */}
+      <div className="pt-2">
         <Card className="rounded-sm p-6">
           <div className="flex justify-end gap-6">
             <Button
