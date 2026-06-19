@@ -17,6 +17,8 @@ export default function Page() {
       cityName: "",
     },
 
+    // child
+
     childFirstName: "",
     childMiddleName: "",
     childLastName: "",
@@ -41,6 +43,29 @@ export default function Page() {
     multipleBirthOrder: "",
     birthOrder: "",
     weight: "",
+
+    // mother
+    motherFirstName: "",
+    motherMiddleName: "",
+    motherLastName: "",
+    motherCitizenship: "",
+    motherReligion: "",
+    totalNumOfChildren: "",
+    noOfChildrenAlive: "",
+    noOfChildrenDead: "",
+    motherOccupation: "",
+    motherAge: "",
+    motherResidence: {
+      regionCode: "",
+      regionName: "",
+      provinceCode: "",
+      provinceName: "",
+      cityCode: "",
+      cityName: "",
+      barangayCode: "",
+      barangayName: "",
+    },
+    motherHouserOrSt: "",
   });
 
   return (
@@ -48,8 +73,10 @@ export default function Page() {
       <div>
         <BirthRegistrationForm formData={formData} setFormData={setFormData} />
       </div>
-      <div className="sticky top-4 ">
-        <BirthCertificatePreview data={formData} />{" "}
+      <div>
+        <div className="sticky top-20 ">
+          <BirthCertificatePreview data={formData} />
+        </div>
       </div>
     </div>
   );

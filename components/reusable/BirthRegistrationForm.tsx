@@ -173,6 +173,8 @@ const BirthRegistrationForm = ({
               </div>
             </div>
           </div>
+
+          {/* Mother's Data */}
           <div className="border-b border-gray-500">
             <h5 className="mb-2 font-medium">Mother's Data</h5>
 
@@ -182,20 +184,22 @@ const BirthRegistrationForm = ({
 
               <FloatingInput
                 label="First"
-                value={formData.childFirstName}
-                onChange={(e) => updateField("childFirstName", e.target.value)}
+                value={formData.motherFirstName}
+                onChange={(e) => updateField("motherFirstName", e.target.value)}
               />
 
               <FloatingInput
                 label="Middle"
-                value={formData.childMiddleName}
-                onChange={(e) => updateField("childMiddleName", e.target.value)}
+                value={formData.motherMiddleName}
+                onChange={(e) =>
+                  updateField("motherMiddleName", e.target.value)
+                }
               />
 
               <FloatingInput
                 label="Last"
-                value={formData.childLastName}
-                onChange={(e) => updateField("childLastName", e.target.value)}
+                value={formData.motherLastName}
+                onChange={(e) => updateField("motherLastName", e.target.value)}
               />
             </div>
 
@@ -205,8 +209,10 @@ const BirthRegistrationForm = ({
 
               <FloatingInput
                 label="Citizenship"
-                value={formData.childFirstName}
-                onChange={(e) => updateField("childFirstName", e.target.value)}
+                value={formData.motherCitizenship}
+                onChange={(e) =>
+                  updateField("motherCitizenship", e.target.value)
+                }
               />
             </div>
             {/*  Religion */}
@@ -214,9 +220,99 @@ const BirthRegistrationForm = ({
               <label className="col-span-3">9. RELIGION/RELIGIOUS SECT:</label>
 
               <FloatingInput
-                label="Citizenship"
-                value={formData.childFirstName}
-                onChange={(e) => updateField("childFirstName", e.target.value)}
+                label="Religion"
+                value={formData.motherReligion}
+                onChange={(e) => updateField("motherReligion", e.target.value)}
+              />
+            </div>
+
+            {/*  total number of children born alive */}
+            <div className="mb-2  gap-2">
+              <label className="col-span-3">
+                10a. TOTAL NUMBER OF CHILDREN BORN ALIVE:
+              </label>
+
+              <FloatingInput
+                label="No. of children born"
+                value={formData.totalNumOfChildren}
+                onChange={(e) =>
+                  updateField("totalNumOfChildren", e.target.value)
+                }
+              />
+            </div>
+
+            {/*  total number of children born alive */}
+            <div className="mb-2  gap-2">
+              <label className="col-span-3">
+                10b. NO. OF CHILDREN STILL LIVING INCLUDING THIS BIRTH:
+              </label>
+
+              <FloatingInput
+                label="No. of living children"
+                value={formData.noOfChildrenAlive}
+                onChange={(e) =>
+                  updateField("noOfChildrenAlive", e.target.value)
+                }
+              />
+            </div>
+
+            {/*  total number of children born alive */}
+            <div className="mb-2  gap-2">
+              <label className="col-span-3">
+                10c. NO. OF CHILDREN BORN ALIVE BUT ARE NOW DEAD:
+              </label>
+
+              <FloatingInput
+                label="No. of dean children"
+                value={formData.noOfChildrenDead}
+                onChange={(e) =>
+                  updateField("noOfChildrenDead", e.target.value)
+                }
+              />
+            </div>
+
+            {/*  occupation */}
+            <div className="mb-2  gap-2">
+              <label className="col-span-3">11. OCCUPATION:</label>
+
+              <FloatingInput
+                label="Occupation"
+                value={formData.motherOccupation}
+                onChange={(e) =>
+                  updateField("motherOccupation", e.target.value)
+                }
+              />
+            </div>
+
+            {/*  total number of children born alive */}
+            <div className="mb-2  gap-2">
+              <label className="col-span-3">
+                12. AGE AT THE TIME OF THIS BIRTH:
+              </label>
+
+              <FloatingInput
+                label="Complete Years"
+                value={formData.motherAge}
+                onChange={(e) => updateField("motherAge", e.target.value)}
+              />
+            </div>
+
+            {/* Residence */}
+            <div className="mb-2">
+              <label>13. RESIDENCE:</label>
+
+              <AddressSelector
+                fields={["region", "province", "city", "barangay"]}
+                value={formData.motherResidence}
+                onChange={(value) => updateField("motherResidence", value)}
+              />
+
+              <FloatingInput
+                label="House No./St"
+                value={formData.motherHouserOrSt}
+                onChange={(e) =>
+                  updateField("motherHouserOrSt", e.target.value)
+                }
               />
             </div>
           </div>

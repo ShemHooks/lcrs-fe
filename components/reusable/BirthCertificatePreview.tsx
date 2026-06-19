@@ -14,13 +14,18 @@ export default function BirthCertificatePreview({
     return cityName.replace(/^City Of\s+/i, "") + " City";
   }
 
-  const birthDate = new Date(data.birthDate);
+  const birthDate = data.birthDate ? new Date(data.birthDate) : null;
 
-  const day = birthDate.getDate();
-  const month = birthDate.toLocaleString("en-US", {
-    month: "long",
-  });
-  const year = birthDate.getFullYear();
+  const isValidDate = birthDate && !isNaN(birthDate.getTime());
+
+  const day = isValidDate ? birthDate.getDate() : "";
+  const month = isValidDate
+    ? birthDate.toLocaleString("en-US", { month: "long" })
+    : "";
+  const year = isValidDate ? birthDate.getFullYear() : "";
+
+  const x = (value: number) => `${(value / 850) * 100}%`;
+  const y = (value: number) => `${(value / 1100) * 100}%`;
 
   return (
     <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
@@ -28,8 +33,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font "
         style={{
-          top: "88px",
-          left: "100px",
+          top: y(100),
+          left: x(150),
         }}
       >
         {data.address.provinceName}
@@ -38,18 +43,18 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font "
         style={{
-          top: "102px",
-          left: "100px",
+          top: y(120),
+          left: x(190),
         }}
       >
         {formatCityName(data.address.cityName)}
       </span>
       {/* First Name */}
       <span
-        className="absolute text-[11px] birth-font "
+        className="absolute birth-font text-[12px]"
         style={{
-          top: "132px",
-          left: "100px",
+          top: y(148),
+          left: x(180),
         }}
       >
         {data.childFirstName}
@@ -59,8 +64,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "132px",
-          left: "195px",
+          top: y(148),
+          left: x(400),
         }}
       >
         {data.childMiddleName}
@@ -70,8 +75,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "132px",
-          left: "300px",
+          top: y(148),
+          left: x(600),
         }}
       >
         {data.childLastName}
@@ -81,8 +86,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "158px",
-          left: "85px",
+          top: y(178),
+          left: x(150),
         }}
       >
         {data.gender}
@@ -93,8 +98,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "158px",
-          left: "227px",
+          top: y(178),
+          left: x(450),
         }}
       >
         {day}
@@ -104,8 +109,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "158px",
-          left: "278px",
+          top: y(178),
+          left: x(570),
         }}
       >
         {month}
@@ -115,49 +120,36 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "158px",
-          left: "355px",
+          top: y(178),
+          left: x(700),
         }}
       >
         {year}
       </span>
 
-      {/* Hospital */}
-      <span
-        className="absolute text-[11px] birth-font"
+      {/* place of birth */}
+      <div
+        className="absolute flex gap-2 text-[11px] birth-font"
         style={{
-          top: "188px",
-          left: "45px",
+          top: y(220),
+          left: x(90),
         }}
       >
-        {data.hospitalName},
-      </span>
-      {/* City */}
-      <span
-        className="absolute text-[11px] birth-font"
-        style={{
-          top: "188px",
-          left: "206px",
-        }}
-      >
-        {formatCityName(data.placeOfBirth.cityName)},
-      </span>
-      {/* Province */}
-      <span
-        className="absolute text-[11px] birth-font"
-        style={{
-          top: "188px",
-          left: "300px",
-        }}
-      >
-        {data.placeOfBirth.provinceName}
-      </span>
+        <span>{data.hospitalName},</span>
+        {data.placeOfBirth.barangayName && (
+          <span>{data.placeOfBirth.barangayName},</span>
+        )}
+        <span>{formatCityName(data.placeOfBirth.cityName)},</span>
+
+        <span>{data.placeOfBirth.provinceName}</span>
+      </div>
+
       {/* type of birth */}
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "218px",
-          left: "65px",
+          top: y(260),
+          left: x(190),
         }}
       >
         {data.typeOfBirth}
@@ -167,8 +159,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "218px",
-          left: "65px",
+          top: y(260),
+          left: x(360),
         }}
       >
         {data.multipleBirthOrder}
@@ -178,8 +170,8 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "225px",
-          left: "270px",
+          top: y(260),
+          left: x(540),
         }}
       >
         {data.birthOrder}
@@ -189,11 +181,66 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[11px] birth-font"
         style={{
-          top: "222px",
-          left: "356px",
+          top: y(260),
+          left: x(690),
         }}
       >
         {data.weight}
+      </span>
+
+      {/* MOther */}
+
+      {/* Mother F Name */}
+      <span
+        className="absolute text-[11px] birth-font"
+        style={{
+          top: y(290),
+          left: x(200),
+        }}
+      >
+        {data.motherFirstName}
+      </span>
+
+      {/* Mother M Name */}
+      <span
+        className="absolute text-[11px] birth-font"
+        style={{
+          top: y(290),
+          left: x(400),
+        }}
+      >
+        {data.motherMiddleName}
+      </span>
+      {/* Mother L Name */}
+      <span
+        className="absolute text-[11px] birth-font"
+        style={{
+          top: y(290),
+          left: x(600),
+        }}
+      >
+        {data.motherLastName}
+      </span>
+
+      {/* Mother Citizenship */}
+      <span
+        className="absolute text-[11px] birth-font"
+        style={{
+          top: y(320),
+          left: x(200),
+        }}
+      >
+        {data.motherCitizenship}
+      </span>
+      {/* Mother Religion */}
+      <span
+        className="absolute text-[11px] birth-font"
+        style={{
+          top: y(320),
+          left: x(600),
+        }}
+      >
+        {data.motherReligion}
       </span>
     </FormPreviewContainer>
   );
