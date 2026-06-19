@@ -19,9 +19,11 @@ export function FloatingInput({
   const [showPassword, setShowPassword] = useState(false);
 
   const isPassword = type === "password";
+  const hasIcon = !!icon;
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
+      {/* ICON */}
       {icon && (
         <div
           className={`absolute top-4 text-gray-500 ${
@@ -32,13 +34,15 @@ export function FloatingInput({
         </div>
       )}
 
+      {/* INPUT */}
       <input
         type={isPassword ? (showPassword ? "text" : "password") : type}
         placeholder=" "
         className={`
           peer
           w-full
-          ${iconPosition === "left" ? "pl-12 pr-12" : "pl-4 pr-12"}
+           ${hasIcon ? (iconPosition === "left" ? "pl-12" : "pl-3") : "pl-3"}
+          pr-12
           pt-6
           pb-2
           border-0
@@ -51,15 +55,24 @@ export function FloatingInput({
         {...props}
       />
 
+      {/* LABEL */}
       <label
         className={`
           absolute
-          ${iconPosition === "left" ? "left-12" : "left-4"}
-          top-4
           text-gray-500
           pointer-events-none
           transition-all
           duration-200
+
+          ${
+            hasIcon
+              ? iconPosition === "left"
+                ? "left-12"
+                : "left-3"
+              : "left-3"
+          }
+
+          top-4
           peer-focus:top-1
           peer-focus:text-xs
           peer-focus:text-blue-500
@@ -70,6 +83,7 @@ export function FloatingInput({
         {label}
       </label>
 
+      {/* PASSWORD TOGGLE */}
       {isPassword && (
         <button
           type="button"

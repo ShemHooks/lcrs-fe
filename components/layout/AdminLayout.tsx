@@ -2,7 +2,7 @@
 
 import Topbar from "../reusable/Topbar";
 import Sidebar from "../reusable/Sidebar";
-import adminMenu from "@/lib/menu/AdminMenu";
+import { adminMenu } from "@/lib/menu/AdminMenu";
 
 export default function AdminLayout({
   children,

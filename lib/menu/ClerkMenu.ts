@@ -11,33 +11,33 @@ import {
 export const clerkMenu = [
   {
     name: "Dashboard",
-    path: "/admin/dashboard",
+    path: "/clerk/dashboard",
     icon: LayoutDashboard,
   },
   {
     name: "Registration",
-    path: "/admin/registration",
+    path: "/clerk/registration",
     icon: FileText,
   },
   {
     name: "Records",
-    path: "/admin/records",
+    path: "/clerk/records",
     icon: Archive,
   },
 
   {
     name: "Analytics",
-    path: "/admin/analytics",
+    path: "/clerk/analytics",
     icon: BarChart3,
   },
   {
     name: "Forms",
-    path: "/admin/forms",
+    path: "/clerk/forms",
     icon: Download,
   },
   {
     name: "Settings",
-    path: "/admin/settings",
+    path: "/clerk/settings",
     icon: Settings,
   },
 ];
