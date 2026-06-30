@@ -316,6 +316,268 @@ const BirthRegistrationForm = ({
               />
             </div>
           </div>
+
+          {/* Father's Data */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Father's Data</h5>
+
+            <div className="mb-2 grid grid-cols-3 gap-2">
+              <label className="col-span-3">14. NAME:</label>
+
+              <FloatingInput
+                label="First"
+                value={formData.fatherFirstName}
+                onChange={(e) => updateField("fatherFirstName", e.target.value)}
+              />
+
+              <FloatingInput
+                label="Middle"
+                value={formData.fatherMiddleName}
+                onChange={(e) =>
+                  updateField("fatherMiddleName", e.target.value)
+                }
+              />
+
+              <FloatingInput
+                label="Last"
+                value={formData.fatherLastName}
+                onChange={(e) => updateField("fatherLastName", e.target.value)}
+              />
+            </div>
+
+            <FloatingInput
+              label="15. Citizenship"
+              value={formData.fatherCitizenship}
+              onChange={(e) => updateField("fatherCitizenship", e.target.value)}
+            />
+
+            <FloatingInput
+              label="16. Religion / Religious Sect"
+              value={formData.fatherReligion}
+              onChange={(e) => updateField("fatherReligion", e.target.value)}
+            />
+
+            <FloatingInput
+              label="17. Occupation"
+              value={formData.fatherOccupation}
+              onChange={(e) => updateField("fatherOccupation", e.target.value)}
+            />
+
+            <FloatingInput
+              label="18. Age"
+              value={formData.fatherAge}
+              onChange={(e) => updateField("fatherAge", e.target.value)}
+            />
+
+            <div className="mt-4">
+              <label>19. Residence</label>
+
+              <AddressSelector
+                fields={["region", "province", "city", "barangay"]}
+                value={formData.fatherResidence}
+                onChange={(value) => updateField("fatherResidence", value)}
+              />
+
+              <FloatingInput
+                label="House No. / Street"
+                value={formData.fatherHouseOrSt}
+                onChange={(e) => updateField("fatherHouseOrSt", e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Marriage of Parents */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Marriage of Parents</h5>
+
+            <div className="mb-4">
+              <label>20a. Date of Marriage</label>
+
+              <input
+                type="date"
+                value={formData.marriageDate}
+                onChange={(e) => updateField("marriageDate", e.target.value)}
+                className="ml-4"
+              />
+            </div>
+
+            <div>
+              <label>20b. Place of Marriage</label>
+
+              <AddressSelector
+                fields={["region", "province", "city"]}
+                value={formData.marriagePlace}
+                onChange={(value) => updateField("marriagePlace", value)}
+              />
+
+              {/* <FloatingInput
+                label="House No. / Street"
+                value={formData.marriageHouseOrSt}
+                onChange={(e) =>
+                  updateField("marriageHouseOrSt", e.target.value)
+                }
+              /> */}
+            </div>
+          </div>
+
+          {/* Attendant */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Attendant At Birth</h5>
+
+            <select
+              className="w-full border p-2"
+              value={formData.attendantType}
+              onChange={(e) => updateField("attendantType", e.target.value)}
+            >
+              <option value="">Select</option>
+              <option value="Physician">Physician</option>
+              <option value="Nurse">Nurse</option>
+              <option value="Midwife">Midwife</option>
+              <option value="Hilot">Hilot</option>
+              <option value="Others">Others</option>
+            </select>
+
+            <FloatingInput
+              label="Name"
+              value={formData.attendantName}
+              onChange={(e) => updateField("attendantName", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Address"
+              value={formData.attendantAddress}
+              onChange={(e) => updateField("attendantAddress", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Title / Position"
+              value={formData.attendantPosition}
+              onChange={(e) => updateField("attendantPosition", e.target.value)}
+            />
+
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="date"
+                value={formData.attendantCertificationDate}
+                onChange={(e) =>
+                  updateField("attendantCertificationDate", e.target.value)
+                }
+              />
+
+              <input
+                type="time"
+                value={formData.attendantCertificationTime}
+                onChange={(e) =>
+                  updateField("attendantCertificationTime", e.target.value)
+                }
+                className="m-2"
+              />
+            </div>
+          </div>
+          {/* Informant */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Certification of Informant</h5>
+
+            <FloatingInput
+              label="Name"
+              value={formData.informantName}
+              onChange={(e) => updateField("informantName", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Relationship to Child"
+              value={formData.informantRelationship}
+              onChange={(e) =>
+                updateField("informantRelationship", e.target.value)
+              }
+            />
+
+            <FloatingInput
+              label="Address"
+              value={formData.informantAddress}
+              onChange={(e) => updateField("informantAddress", e.target.value)}
+            />
+
+            <input
+              type="date"
+              value={formData.informantDate}
+              onChange={(e) => updateField("informantDate", e.target.value)}
+              className="m-2"
+            />
+          </div>
+          {/* Prepared by */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Prepared By</h5>
+
+            <FloatingInput
+              label="Name"
+              value={formData.preparedByName}
+              onChange={(e) => updateField("preparedByName", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Position"
+              value={formData.preparedByPosition}
+              onChange={(e) =>
+                updateField("preparedByPosition", e.target.value)
+              }
+            />
+
+            <input
+              type="date"
+              value={formData.preparedByDate}
+              onChange={(e) => updateField("preparedByDate", e.target.value)}
+              className="m-2"
+            />
+          </div>
+          {/* received by */}
+          <div className="border-b border-gray-500">
+            <h5 className="mb-2 font-medium">Received By</h5>
+
+            <FloatingInput
+              label="Name"
+              value={formData.receivedByName}
+              onChange={(e) => updateField("receivedByName", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Position"
+              value={formData.receivedByPosition}
+              onChange={(e) =>
+                updateField("receivedByPosition", e.target.value)
+              }
+            />
+
+            <input
+              type="date"
+              value={formData.receivedByDate}
+              onChange={(e) => updateField("receivedByDate", e.target.value)}
+            />
+          </div>
+          {/* Civil Registrar */}
+          <div>
+            <h5 className="mb-2 font-medium">
+              Registered By The Civil Registrar
+            </h5>
+
+            <FloatingInput
+              label="Name"
+              value={formData.registrarName}
+              onChange={(e) => updateField("registrarName", e.target.value)}
+            />
+
+            <FloatingInput
+              label="Position"
+              value={formData.registrarPosition}
+              onChange={(e) => updateField("registrarPosition", e.target.value)}
+            />
+
+            <input
+              type="date"
+              value={formData.registrarDate}
+              onChange={(e) => updateField("registrarDate", e.target.value)}
+            />
+          </div>
         </div>
       </Card>
     </div>

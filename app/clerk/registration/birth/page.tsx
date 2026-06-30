@@ -66,6 +66,75 @@ export default function Page() {
       barangayName: "",
     },
     motherHouserOrSt: "",
+    // father
+    fatherFirstName: "",
+    fatherMiddleName: "",
+    fatherLastName: "",
+
+    fatherCitizenship: "",
+    fatherReligion: "",
+
+    fatherOccupation: "",
+    fatherAge: "",
+
+    fatherResidence: {
+      regionCode: "",
+      regionName: "",
+      provinceCode: "",
+      provinceName: "",
+      cityCode: "",
+      cityName: "",
+      barangayCode: "",
+      barangayName: "",
+    },
+
+    fatherHouseOrSt: "",
+
+    // marriage
+    marriageDate: "",
+
+    marriagePlace: {
+      regionCode: "",
+      regionName: "",
+      provinceCode: "",
+      provinceName: "",
+      cityCode: "",
+      cityName: "",
+      barangayCode: "",
+      barangayName: "",
+    },
+
+    marriageHouseOrSt: "",
+
+    // attendant
+    attendantType: "",
+    attendantName: "",
+    attendantAddress: "",
+    attendantPosition: "",
+    attendantCertificationDate: "",
+    attendantCertificationTime: "",
+
+    // informant
+    informantSignature: "",
+    informantName: "",
+    informantRelationship: "",
+    informantAddress: "",
+    informantDate: "",
+
+    // prepared by
+    preparedByName: "",
+    preparedByPosition: "",
+    preparedByDate: "",
+
+    // received by
+    receivedByName: "",
+    receivedByPosition: "",
+    receivedByDate: "",
+
+    // registrar
+    registrarName: "",
+    registrarPosition: "",
+    registrarDate: "",
   });
 
   return (
