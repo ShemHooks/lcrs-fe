@@ -101,7 +101,7 @@ const BirthRegistrationForm = ({
               <input
                 type="date"
                 className="ml-4"
-                value={formData.birthDate}
+                value={formData.childBirthDate}
                 onChange={(e) => updateField("birthDate", e.target.value)}
               />
             </div>
@@ -503,79 +503,6 @@ const BirthRegistrationForm = ({
               value={formData.informantDate}
               onChange={(e) => updateField("informantDate", e.target.value)}
               className="m-2"
-            />
-          </div>
-          {/* Prepared by */}
-          <div className="border-b border-gray-500">
-            <h5 className="mb-2 font-medium">Prepared By</h5>
-
-            <FloatingInput
-              label="Name"
-              value={formData.preparedByName}
-              onChange={(e) => updateField("preparedByName", e.target.value)}
-            />
-
-            <FloatingInput
-              label="Position"
-              value={formData.preparedByPosition}
-              onChange={(e) =>
-                updateField("preparedByPosition", e.target.value)
-              }
-            />
-
-            <input
-              type="date"
-              value={formData.preparedByDate}
-              onChange={(e) => updateField("preparedByDate", e.target.value)}
-              className="m-2"
-            />
-          </div>
-          {/* received by */}
-          <div className="border-b border-gray-500">
-            <h5 className="mb-2 font-medium">Received By</h5>
-
-            <FloatingInput
-              label="Name"
-              value={formData.receivedByName}
-              onChange={(e) => updateField("receivedByName", e.target.value)}
-            />
-
-            <FloatingInput
-              label="Position"
-              value={formData.receivedByPosition}
-              onChange={(e) =>
-                updateField("receivedByPosition", e.target.value)
-              }
-            />
-
-            <input
-              type="date"
-              value={formData.receivedByDate}
-              onChange={(e) => updateField("receivedByDate", e.target.value)}
-            />
-          </div>
-          {/* Civil Registrar */}
-          <div>
-            <h5 className="mb-2 font-medium">
-              Registered By The Civil Registrar
-            </h5>
-
-            <FloatingInput
-              label="Name"
-              value={formData.registrarName}
-              onChange={(e) => updateField("registrarName", e.target.value)}
-            />
-
-            <FloatingInput
-              label="Position"
-              value={formData.registrarPosition}
-              onChange={(e) => updateField("registrarPosition", e.target.value)}
-            />
-
-            <input
-              type="date"
-              value={formData.registrarDate}
-              onChange={(e) => updateField("registrarDate", e.target.value)}
             />
           </div>
         </div>

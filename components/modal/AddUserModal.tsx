@@ -33,6 +33,7 @@ const AddUserModal = ({ open, onOpenChange }: Props) => {
     username: "",
     email: "",
     role: "",
+    position: "",
     isActive: true,
   });
 
@@ -71,6 +72,7 @@ const AddUserModal = ({ open, onOpenChange }: Props) => {
             email: "",
             role: "",
             isActive: true,
+            position: "",
           });
 
           onOpenChange(false);
@@ -168,6 +170,21 @@ const AddUserModal = ({ open, onOpenChange }: Props) => {
                     setFormData({
                       ...formData,
                       email: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label>
+                  Position <p className="text-red-500">*</p>
+                </Label>
+                <Input
+                  className="rounded-sm focus-visible:border-red-500 focus-visible:ring-0"
+                  value={formData.position}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      position: e.target.value,
                     })
                   }
                 />

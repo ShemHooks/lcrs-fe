@@ -24,7 +24,7 @@ export default function Page() {
     childLastName: "",
 
     gender: "",
-    birthDate: "",
+    childBirthDate: "",
 
     placeOfBirth: {
       regionCode: "",
@@ -120,21 +120,6 @@ export default function Page() {
     informantRelationship: "",
     informantAddress: "",
     informantDate: "",
-
-    // prepared by
-    preparedByName: "",
-    preparedByPosition: "",
-    preparedByDate: "",
-
-    // received by
-    receivedByName: "",
-    receivedByPosition: "",
-    receivedByDate: "",
-
-    // registrar
-    registrarName: "",
-    registrarPosition: "",
-    registrarDate: "",
   });
 
   return (
@@ -144,7 +129,7 @@ export default function Page() {
       </div>
       <div>
         <div className="sticky top-20 ">
-          <BirthCertificatePreview data={formData} />
+          <BirthCertificatePreview childData={formData} />
         </div>
       </div>
     </div>

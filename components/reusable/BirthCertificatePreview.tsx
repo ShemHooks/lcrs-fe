@@ -1,13 +1,14 @@
 import FormPreviewContainer from "./FormPreviewContainer";
 import { BirthRegistrationData } from "@/lib/types/birth-registration";
 import { X } from "lucide-react";
+import { getProfile } from "@/server/hooks/authHooks";
 
 interface BirthCertificatePreviewProps {
-  data: BirthRegistrationData;
+  childData: BirthRegistrationData;
 }
 
 export default function BirthCertificatePreview({
-  data,
+  childData,
 }: BirthCertificatePreviewProps) {
   function formatCityName(cityName?: string) {
     if (!cityName) return "";
@@ -15,7 +16,9 @@ export default function BirthCertificatePreview({
     return cityName.replace(/^City Of\s+/i, "") + " City";
   }
 
-  const birthDate = data.birthDate ? new Date(data.birthDate) : null;
+  const birthDate = childData.childBirthDate
+    ? new Date(childData.childBirthDate)
+    : null;
 
   const isValidDate = birthDate && !isNaN(birthDate.getTime());
 
@@ -28,8 +31,8 @@ export default function BirthCertificatePreview({
   const x = (value: number) => `${(value / 850) * 100}%`;
   const y = (value: number) => `${(value / 1100) * 100}%`;
 
-  const parentMarraigeDate = data.marriageDate
-    ? new Date(data.marriageDate)
+  const parentMarraigeDate = childData.marriageDate
+    ? new Date(childData.marriageDate)
     : null;
 
   const isValidMarraigeDate =
@@ -53,6 +56,16 @@ export default function BirthCertificatePreview({
     return `${displayHour}:${minutes.toString().padStart(2, "0")}`;
   };
 
+  const { data, isLoading, isError, error } = getProfile();
+
+  const today = new Date();
+
+  const formattedToday = today.toLocaleDateString("en-us", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
       {/* Province */}
@@ -63,7 +76,7 @@ export default function BirthCertificatePreview({
           left: x(150),
         }}
       >
-        {data.address.provinceName}
+        {childData.address.provinceName}
       </span>
       {/* City */}
       <span
@@ -73,7 +86,7 @@ export default function BirthCertificatePreview({
           left: x(190),
         }}
       >
-        {formatCityName(data.address.cityName)}
+        {formatCityName(childData.address.cityName)}
       </span>
       {/* First Name */}
       <span
@@ -83,7 +96,7 @@ export default function BirthCertificatePreview({
           left: x(180),
         }}
       >
-        {data.childFirstName}
+        {childData.childFirstName}
       </span>
 
       {/* Middle Name */}
@@ -94,7 +107,7 @@ export default function BirthCertificatePreview({
           left: x(400),
         }}
       >
-        {data.childMiddleName}
+        {childData.childMiddleName}
       </span>
 
       {/* Last Name */}
@@ -105,7 +118,7 @@ export default function BirthCertificatePreview({
           left: x(600),
         }}
       >
-        {data.childLastName}
+        {childData.childLastName}
       </span>
 
       {/* Gender */}
@@ -116,7 +129,7 @@ export default function BirthCertificatePreview({
           left: x(150),
         }}
       >
-        {data.gender}
+        {childData.gender}
       </span>
 
       {/* Date of Birth */}
@@ -161,13 +174,13 @@ export default function BirthCertificatePreview({
           left: x(90),
         }}
       >
-        <span>{data.hospitalName},</span>
-        {data.placeOfBirth.barangayName && (
-          <span>{data.placeOfBirth.barangayName},</span>
+        <span>{childData.hospitalName},</span>
+        {childData.placeOfBirth.barangayName && (
+          <span>{childData.placeOfBirth.barangayName},</span>
         )}
-        <span>{formatCityName(data.placeOfBirth.cityName)},</span>
+        <span>{formatCityName(childData.placeOfBirth.cityName)},</span>
 
-        <span>{data.placeOfBirth.provinceName}</span>
+        <span>{childData.placeOfBirth.provinceName}</span>
       </div>
 
       {/* type of birth */}
@@ -178,7 +191,7 @@ export default function BirthCertificatePreview({
           left: x(190),
         }}
       >
-        {data.typeOfBirth}
+        {childData.typeOfBirth}
       </span>
 
       {/* If multiple */}
@@ -189,7 +202,7 @@ export default function BirthCertificatePreview({
           left: x(360),
         }}
       >
-        {data.multipleBirthOrder}
+        {childData.multipleBirthOrder}
       </span>
 
       {/* birth order*/}
@@ -200,7 +213,7 @@ export default function BirthCertificatePreview({
           left: x(540),
         }}
       >
-        {data.birthOrder}
+        {childData.birthOrder}
       </span>
 
       {/* weight at birth */}
@@ -211,7 +224,7 @@ export default function BirthCertificatePreview({
           left: x(690),
         }}
       >
-        {data.weight}
+        {childData.weight}
       </span>
 
       {/* MOther */}
@@ -224,7 +237,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.motherFirstName}
+        {childData.motherFirstName}
       </span>
 
       {/* Mother M Name */}
@@ -235,7 +248,7 @@ export default function BirthCertificatePreview({
           left: x(400),
         }}
       >
-        {data.motherMiddleName}
+        {childData.motherMiddleName}
       </span>
       {/* Mother L Name */}
       <span
@@ -245,7 +258,7 @@ export default function BirthCertificatePreview({
           left: x(600),
         }}
       >
-        {data.motherLastName}
+        {childData.motherLastName}
       </span>
 
       {/* Mother Citizenship */}
@@ -256,7 +269,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.motherCitizenship}
+        {childData.motherCitizenship}
       </span>
       {/* Mother Religion */}
       <span
@@ -266,7 +279,7 @@ export default function BirthCertificatePreview({
           left: x(600),
         }}
       >
-        {data.motherReligion}
+        {childData.motherReligion}
       </span>
       {/* Total of born alive */}
       <span
@@ -276,7 +289,7 @@ export default function BirthCertificatePreview({
           left: x(120),
         }}
       >
-        {data.totalNumOfChildren}
+        {childData.totalNumOfChildren}
       </span>
       {/* Number of children still living */}
       <span
@@ -286,7 +299,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.noOfChildrenAlive}
+        {childData.noOfChildrenAlive}
       </span>
       {/* number of dead children */}
       <span
@@ -296,7 +309,7 @@ export default function BirthCertificatePreview({
           left: x(380),
         }}
       >
-        {data.noOfChildrenDead}
+        {childData.noOfChildrenDead}
       </span>
       {/* Occupation */}
       <span
@@ -306,7 +319,7 @@ export default function BirthCertificatePreview({
           left: x(500),
         }}
       >
-        {data.motherOccupation}
+        {childData.motherOccupation}
       </span>
       {/* Mother Age */}
       <span
@@ -316,7 +329,7 @@ export default function BirthCertificatePreview({
           left: x(710),
         }}
       >
-        {data.motherAge}
+        {childData.motherAge}
       </span>
       {/* mother residence */}
       <div
@@ -326,15 +339,15 @@ export default function BirthCertificatePreview({
           left: x(80),
         }}
       >
-        <span>{data.motherHouserOrSt},</span>
-        {data.motherResidence.barangayName && (
-          <span>{data.motherResidence.barangayName},</span>
+        <span>{childData.motherHouserOrSt},</span>
+        {childData.motherResidence.barangayName && (
+          <span>{childData.motherResidence.barangayName},</span>
         )}
-        <span>{formatCityName(data.motherResidence.cityName)},</span>
+        <span>{formatCityName(childData.motherResidence.cityName)},</span>
 
-        <span>{data.motherResidence.provinceName}</span>
+        <span>{childData.motherResidence.provinceName}</span>
 
-        {data.motherResidence.provinceName && <span>Philipines</span>}
+        {childData.motherResidence.provinceName && <span>Philipines</span>}
       </div>
 
       {/* Father */}
@@ -347,7 +360,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.fatherFirstName}
+        {childData.fatherFirstName}
       </span>
 
       {/* Father M Name */}
@@ -358,7 +371,7 @@ export default function BirthCertificatePreview({
           left: x(400),
         }}
       >
-        {data.fatherMiddleName}
+        {childData.fatherMiddleName}
       </span>
       {/* father L Name */}
       <span
@@ -368,7 +381,7 @@ export default function BirthCertificatePreview({
           left: x(600),
         }}
       >
-        {data.fatherLastName}
+        {childData.fatherLastName}
       </span>
 
       {/* Father Citizenship */}
@@ -379,7 +392,7 @@ export default function BirthCertificatePreview({
           left: x(170),
         }}
       >
-        {data.fatherCitizenship}
+        {childData.fatherCitizenship}
       </span>
       {/* Father Religion */}
       <span
@@ -389,7 +402,7 @@ export default function BirthCertificatePreview({
           left: x(300),
         }}
       >
-        {data.fatherReligion}
+        {childData.fatherReligion}
       </span>
 
       {/* Father Occupation */}
@@ -400,7 +413,7 @@ export default function BirthCertificatePreview({
           left: x(550),
         }}
       >
-        {data.fatherOccupation}
+        {childData.fatherOccupation}
       </span>
 
       {/* Father Age */}
@@ -411,7 +424,7 @@ export default function BirthCertificatePreview({
           left: x(700),
         }}
       >
-        {data.fatherAge}
+        {childData.fatherAge}
       </span>
 
       {/* father residence */}
@@ -422,15 +435,15 @@ export default function BirthCertificatePreview({
           left: x(80),
         }}
       >
-        <span>{data.fatherHouseOrSt},</span>
-        {data.fatherResidence.barangayName && (
-          <span>{data.fatherResidence.barangayName},</span>
+        <span>{childData.fatherHouseOrSt},</span>
+        {childData.fatherResidence.barangayName && (
+          <span>{childData.fatherResidence.barangayName},</span>
         )}
-        <span>{formatCityName(data.fatherResidence.cityName)},</span>
+        <span>{formatCityName(childData.fatherResidence.cityName)},</span>
 
-        <span>{data.fatherResidence.provinceName}</span>
+        <span>{childData.fatherResidence.provinceName}</span>
 
-        {data.fatherResidence.provinceName && <span>Philipines</span>}
+        {childData.fatherResidence.provinceName && <span>Philipines</span>}
       </div>
 
       {/* marraige */}
@@ -478,10 +491,10 @@ export default function BirthCertificatePreview({
           left: x(350),
         }}
       >
-        <span>{formatCityName(data.marriagePlace.cityName)},</span>
+        <span>{formatCityName(childData.marriagePlace.cityName)},</span>
 
-        <span>{data.marriagePlace.provinceName}</span>
-        {data.marriagePlace.provinceName && <span>Philipines</span>}
+        <span>{childData.marriagePlace.provinceName}</span>
+        {childData.marriagePlace.provinceName && <span>Philipines</span>}
       </div>
 
       {/* attendant */}
@@ -496,7 +509,7 @@ export default function BirthCertificatePreview({
           left: x(500),
         }}
       >
-        {formatTime(data.attendantCertificationTime)}
+        {formatTime(childData.attendantCertificationTime)}
       </span>
 
       {/* type */}
@@ -507,20 +520,20 @@ export default function BirthCertificatePreview({
           top: y(590),
 
           left:
-            data.attendantType === "Physician"
+            childData.attendantType === "Physician"
               ? x(70)
-              : data.attendantType === "Nurse"
+              : childData.attendantType === "Nurse"
                 ? x(180)
-                : data.attendantType === "Midwife"
+                : childData.attendantType === "Midwife"
                   ? x(270)
-                  : data.attendantType === "Hilot"
+                  : childData.attendantType === "Hilot"
                     ? x(370)
-                    : data.attendantType === "Others"
+                    : childData.attendantType === "Others"
                       ? x(580)
                       : x(0),
         }}
       >
-        {data.attendantType && <span>x</span>}
+        {childData.attendantType && <span>x</span>}
       </span>
       {/* Attendant Name */}
       <span
@@ -530,7 +543,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.attendantName}
+        {childData.attendantName}
       </span>
 
       {/* Attendant Address */}
@@ -542,7 +555,7 @@ export default function BirthCertificatePreview({
           width: x(180), // width of the address field
         }}
       >
-        {data.attendantAddress}
+        {childData.attendantAddress}
       </span>
 
       {/* Attendant Position */}
@@ -553,7 +566,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.attendantPosition}
+        {childData.attendantPosition}
       </span>
 
       {/* Attendant Signed Date */}
@@ -564,7 +577,7 @@ export default function BirthCertificatePreview({
           left: x(500),
         }}
       >
-        {data.attendantCertificationDate}
+        {childData.attendantCertificationDate}
       </span>
 
       {/* Infromant */}
@@ -575,7 +588,7 @@ export default function BirthCertificatePreview({
           left: x(150),
         }}
       >
-        {data.informantName}
+        {childData.informantName}
       </span>
       {/* informant relationship */}
       <span
@@ -585,7 +598,7 @@ export default function BirthCertificatePreview({
           left: x(200),
         }}
       >
-        {data.informantRelationship}
+        {childData.informantRelationship}
       </span>
       {/* informat address */}
       <span
@@ -595,7 +608,7 @@ export default function BirthCertificatePreview({
           left: x(110),
         }}
       >
-        {data.informantAddress}
+        {childData.informantAddress}
       </span>
 
       {/* informant signature data */}
@@ -606,7 +619,7 @@ export default function BirthCertificatePreview({
           left: x(100),
         }}
       >
-        {data.informantDate}
+        {childData.informantDate}
       </span>
 
       {/* prepared by */}
@@ -614,63 +627,31 @@ export default function BirthCertificatePreview({
       <span
         className="absolute text-[10px] birth-font"
         style={{
-          top: y(860),
-          left: x(160),
+          top: y(760),
+          left: x(560),
         }}
       >
-        {data.preparedByName}
+        {data?.data?.first_name} {data?.data?.last_name}
       </span>
       {/* Posistion */}
       <span
         className="absolute text-[10px] birth-font"
         style={{
-          top: y(880),
-          left: x(160),
+          top: y(780),
+          left: x(560),
         }}
       >
-        {data.preparedByPosition}
+        {data?.data?.position}
       </span>
       {/* date */}
       <span
         className="absolute text-[10px] birth-font"
         style={{
-          top: y(900),
-          left: x(110),
+          top: y(800),
+          left: x(510),
         }}
       >
-        {data.preparedByDate}
-      </span>
-
-      {/* recieved  by */}
-      {/* Name */}
-      <span
-        className="absolute text-[10px] birth-font"
-        style={{
-          top: y(860),
-          left: x(160),
-        }}
-      >
-        {data.receivedByName}
-      </span>
-      {/* Posistion */}
-      <span
-        className="absolute text-[10px] birth-font"
-        style={{
-          top: y(880),
-          left: x(160),
-        }}
-      >
-        {data.receivedByPosition}
-      </span>
-      {/* date */}
-      <span
-        className="absolute text-[10px] birth-font"
-        style={{
-          top: y(900),
-          left: x(110),
-        }}
-      >
-        {data.receivedByDate}
+        {formattedToday}
       </span>
     </FormPreviewContainer>
   );

@@ -9,7 +9,7 @@ export interface BirthRegistrationData {
   childLastName: string;
 
   gender: string;
-  birthDate: string;
+  childBirthDate: string;
 
   placeOfBirth: AddressValue;
   hospitalName: string;
@@ -69,19 +69,4 @@ export interface BirthRegistrationData {
   informantRelationship: string;
   informantAddress: string;
   informantDate: string;
-
-  // prepared by
-  preparedByName: string;
-  preparedByPosition: string;
-  preparedByDate: string;
-
-  // received by
-  receivedByName: string;
-  receivedByPosition: string;
-  receivedByDate: string;
-
-  // register by civil registrar
-  registrarName: string;
-  registrarPosition: string;
-  registrarDate: string;
 }
