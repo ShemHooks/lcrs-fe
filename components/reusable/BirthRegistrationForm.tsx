@@ -102,7 +102,7 @@ const BirthRegistrationForm = ({
                 type="date"
                 className="ml-4"
                 value={formData.childBirthDate}
-                onChange={(e) => updateField("birthDate", e.target.value)}
+                onChange={(e) => updateField("childBirthDate", e.target.value)}
               />
             </div>
 

@@ -1,0 +1,105 @@
+import { BirthRegistrationData } from "@/lib/types/birth-registration";
+
+export const initialBirthRegistrationData: BirthRegistrationData = {
+  address: {
+    regionCode: "",
+    regionName: "",
+    provinceCode: "",
+    provinceName: "",
+    cityCode: "",
+    cityName: "",
+  },
+
+  childFirstName: "",
+  childMiddleName: "",
+  childLastName: "",
+  gender: "",
+  childBirthDate: "",
+
+  placeOfBirth: {
+    regionCode: "",
+    regionName: "",
+    provinceCode: "",
+    provinceName: "",
+    cityCode: "",
+    cityName: "",
+    barangayCode: "",
+    barangayName: "",
+  },
+
+  hospitalName: "",
+  typeOfBirth: "",
+  multipleBirthOrder: "",
+  birthOrder: "",
+  weight: "",
+
+  motherFirstName: "",
+  motherMiddleName: "",
+  motherLastName: "",
+  motherCitizenship: "",
+  motherReligion: "",
+  totalNumOfChildren: "",
+  noOfChildrenAlive: "",
+  noOfChildrenDead: "",
+  motherOccupation: "",
+  motherAge: "",
+
+  motherResidence: {
+    regionCode: "",
+    regionName: "",
+    provinceCode: "",
+    provinceName: "",
+    cityCode: "",
+    cityName: "",
+    barangayCode: "",
+    barangayName: "",
+  },
+
+  motherHouserOrSt: "",
+
+  fatherFirstName: "",
+  fatherMiddleName: "",
+  fatherLastName: "",
+  fatherCitizenship: "",
+  fatherReligion: "",
+  fatherOccupation: "",
+  fatherAge: "",
+
+  fatherResidence: {
+    regionCode: "",
+    regionName: "",
+    provinceCode: "",
+    provinceName: "",
+    cityCode: "",
+    cityName: "",
+    barangayCode: "",
+    barangayName: "",
+  },
+
+  fatherHouseOrSt: "",
+  marriageDate: "",
+
+  marriagePlace: {
+    regionCode: "",
+    regionName: "",
+    provinceCode: "",
+    provinceName: "",
+    cityCode: "",
+    cityName: "",
+    barangayCode: "",
+    barangayName: "",
+  },
+
+  marriageHouseOrSt: "",
+  attendantType: "",
+  attendantName: "",
+  attendantAddress: "",
+  attendantPosition: "",
+  attendantCertificationDate: "",
+  attendantCertificationTime: "",
+  informantSignature: "",
+  informantName: "",
+  informantRelationship: "",
+  informantAddress: "",
+  informantDate: "",
+};

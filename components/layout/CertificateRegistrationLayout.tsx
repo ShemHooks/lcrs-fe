@@ -9,19 +9,21 @@ const CertificateRegistrationLayout = ({
 }) => {
   return (
     <div className="flex-1 flex flex-col">
-      <nav className="flex justify-center gap-4 p-6 items-cente">
-        <button className="bg-transparent border border-gray-600 rounded-sm text-black w-1/3 h-35 hover:bg-gray-200 flex flex-col justify-center items-center ">
-          <Baby size={40} />
-          <h3>Birth Registration</h3>
-        </button>
-        <button className="bg-transparent border border-gray-600 rounded-sm text-black w-1/3 h-35 hover:bg-gray-200 flex flex-col justify-center items-center ">
-          <Heart size={40} />
-          <h3>Marriage Registration</h3>
-        </button>
-        <button className="bg-transparent border border-gray-600 rounded-sm text-black w-1/3 h-35 hover:bg-gray-200 flex flex-col justify-center items-center ">
-          <Cross size={40} />
-          <h3>Death Registration</h3>
-        </button>
+      <nav className="flex gap-3 border-b bg-white px-6 py-4">
+        <Button variant="default" className="gap-2 rounded-lg">
+          <Baby className="h-4 w-4" />
+          Birth Registration
+        </Button>
+
+        <Button variant="outline" className="gap-2 rounded-lg">
+          <Heart className="h-4 w-4" />
+          Marriage Registration
+        </Button>
+
+        <Button variant="outline" className="gap-2 rounded-lg">
+          <Cross className="h-4 w-4" />
+          Death Registration
+        </Button>
       </nav>
 
       <main className=" bg-gray-100 min-h-screen">{children}</main>
