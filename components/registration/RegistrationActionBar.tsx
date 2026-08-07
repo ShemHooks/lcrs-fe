@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, FileCheck, RotateCcw, Save } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 interface RegistrationActionBarProps {
@@ -8,12 +9,13 @@ interface RegistrationActionBarProps {
   hasUnsavedChanges: boolean;
   errorMessage?: string;
   lastSaved?: Date | null;
+
   onReset: () => void;
   onSaveDraft: () => void;
   onReview: () => void;
 }
 
-const RegistrationActionBar = ({
+export default function RegistrationActionBar({
   isPending,
   hasUnsavedChanges,
   errorMessage,
@@ -21,15 +23,16 @@ const RegistrationActionBar = ({
   onReset,
   onSaveDraft,
   onReview,
-}: RegistrationActionBarProps) => {
+}: RegistrationActionBarProps) {
   return (
-    <div className="sticky bottom-0 z-30 border-t bg-white/95 px-5 py-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] backdrop-blur">
+    <div className="sticky bottom-0 z-40 border-t bg-white/95 px-5 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.07)] backdrop-blur">
       {errorMessage && (
         <div
           role="alert"
           className="mb-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+
           <span>{errorMessage}</span>
         </div>
       )}
@@ -47,7 +50,7 @@ const RegistrationActionBar = ({
           </p>
 
           {lastSaved && (
-            <p className="text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               Last saved at{" "}
               {lastSaved.toLocaleTimeString([], {
                 hour: "2-digit",
@@ -91,6 +94,4 @@ const RegistrationActionBar = ({
       </div>
     </div>
   );
-};
-
-export default RegistrationActionBar;
+}

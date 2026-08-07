@@ -16,7 +16,7 @@ export const createBirthRegistration = async (
 ): Promise<BirthRegistrationResponse> => {
   try {
     const response = await api.post<BirthRegistrationResponse>(
-      "/api/birth-registrations",
+      "/api/birth_registration",
       payload,
     );
 

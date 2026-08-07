@@ -8,8 +8,8 @@ const CertificateRegistrationLayout = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="flex-1 flex flex-col">
-      <nav className="flex gap-3 border-b bg-white px-6 py-4">
+    <div className="flex-1 flex flex-col ">
+      <nav className="flex gap-3 border-b bg-white px-6 py-4 mb-4">
         <Button variant="default" className="gap-2 rounded-lg">
           <Baby className="h-4 w-4" />
           Birth Registration

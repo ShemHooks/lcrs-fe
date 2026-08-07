@@ -25,7 +25,7 @@ export default function Topbar() {
   return (
     <header className="bg-white border-b border-emerald-900/5 h-16 flex justify-between items-center px-8 sticky top-0 z-40">
       {/* Tactical Breadcrumb */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 ">
         <div className="bg-emerald-500 p-1.5 rounded-lg text-white shadow-sm shadow-emerald-200"></div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900/100">

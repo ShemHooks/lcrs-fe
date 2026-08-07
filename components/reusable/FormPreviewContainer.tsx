@@ -1,8 +1,10 @@
-import { ReactNode } from "react";
+"use client";
+
+import React from "react";
 
 interface FormPreviewContainerProps {
   imageSrc: string;
-  children: ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function FormPreviewContainer({
@@ -10,10 +12,21 @@ export default function FormPreviewContainer({
   children,
 }: FormPreviewContainerProps) {
   return (
-    <div className="relative overflow-auto rounded-lg border bg-white">
-      <img src={imageSrc} alt="Form Preview" className="w-full h-full" />
+    <div className="w-full overflow-auto rounded-lg border bg-white">
+      {/*
+        This inner container is the coordinate system
+        for both the certificate image and all overlays.
+      */}
+      <div className="relative mx-auto w-full min-w-[600px]">
+        <img
+          src={imageSrc}
+          alt="Certificate of Live Birth Preview"
+          className="block h-auto w-full select-none"
+          draggable={false}
+        />
 
-      {children}
+        {children}
+      </div>
     </div>
   );
 }
