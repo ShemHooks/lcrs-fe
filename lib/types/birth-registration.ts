@@ -70,3 +70,82 @@ export interface BirthRegistrationData {
   informantAddress: string;
   informantDate: string;
 }
+
+export interface BirthRegistrationRecord {
+  id: string;
+  registryNumber: string | null;
+  address: any;
+
+  child: {
+    id: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    gender: string;
+    birthDate: string;
+    placeOfBirth: any;
+    hospitalName: string;
+    typeOfBirth: string;
+    multipleBirthOrder: string;
+    birthOrder: string;
+    weight: string;
+  } | null;
+
+  mother: {
+    id: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    citizenship: string;
+    religion: string;
+    totalNumOfChildren: string;
+    noOfChildrenAlive: string;
+    noOfChildrenDead: string;
+    occupation: string;
+    age: string;
+    residence: any;
+    houseOrStreet: string;
+  } | null;
+
+  father: {
+    id: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    citizenship: string;
+    religion: string;
+    occupation: string;
+    age: string;
+    residence: any;
+    houseOrStreet: string;
+  } | null;
+
+  parentsMarriage: {
+    id: string;
+    marriageDate: string;
+    marriagePlace: any;
+    houseOrStreet: string;
+  } | null;
+
+  attendant: {
+    id: string;
+    type: string;
+    name: string;
+    address: string;
+    position: string;
+    certificationDate: string;
+    certificationTime: string;
+  } | null;
+
+  informant: {
+    id: string;
+    signature: string;
+    name: string;
+    relationship: string;
+    address: string;
+    date: string;
+  } | null;
+
+  createdAt: string;
+  updatedAt: string;
+}
