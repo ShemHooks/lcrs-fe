@@ -4,6 +4,7 @@ import { AlertCircle, Baby, Eye, Loader2, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 import { BirthRegistrationRecord } from "@/lib/types/birth-registration";
 
@@ -207,9 +208,11 @@ function BirthRecordRow({ record }: { record: BirthRegistrationRecord }) {
       </td>
 
       <td className="px-5 py-4 text-right">
-        <Button type="button" size="sm" variant="outline">
-          <Eye className="mr-2 h-4 w-4" />
-          View
+        <Button asChild size="sm" variant="outline">
+          <Link href={`/clerk/records/${record.id}`}>
+            <Eye className="mr-2 h-4 w-4" />
+            View
+          </Link>
         </Button>
       </td>
     </tr>

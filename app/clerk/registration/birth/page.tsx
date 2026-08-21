@@ -12,6 +12,8 @@ import { initialBirthRegistrationData } from "@/lib/constants/initial-birth-regi
 
 import { useCreateBirthRegistration } from "@/server/hooks/birthcertificateHooks";
 
+import { mapBirthFormDataToApi } from "@/lib/mappers/birthRegistrationMapper";
+
 const DRAFT_KEY = "birth-registration-draft";
 
 type PageMode = "edit" | "review";
@@ -169,20 +171,15 @@ export default function Page() {
   const submitRegistration = () => {
     if (!isFormValid) {
       toast.error("Complete all required fields before submitting.");
-
       return;
     }
 
-    mutation.mutate(formData, {
+    const payload = mapBirthFormDataToApi(formData);
+
+    mutation.mutate(payload, {
       onSuccess: (response) => {
-        /**
-         * Remove saved draft
-         */
         sessionStorage.removeItem(DRAFT_KEY);
 
-        /**
-         * Reset form
-         */
         setFormData(initialBirthRegistrationData);
 
         setSavedSnapshot(JSON.stringify(initialBirthRegistrationData));
@@ -260,7 +257,7 @@ export default function Page() {
         validationErrors={validationErrors}
         isFormValid={isFormValid}
         isPending={mutation.isPending}
-        errorMessage={submissionError}
+        // errorMessage={submissionError}
         onBack={backToEdit}
         onSubmit={submitRegistration}
       />

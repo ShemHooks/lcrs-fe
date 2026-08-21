@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import RecordsControl from "@/components/reusable/RecordsControl";
 import RecordsTable from "@/components/records/RecordsTable";
 

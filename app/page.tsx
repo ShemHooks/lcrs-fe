@@ -39,6 +39,8 @@ export default function Home() {
             router.push("/admin");
           } else if (response.data.user.role === "Staff") {
             router.push("/clerk");
+          } else if (response.data.user.role === "Reviewer") {
+            router.push("/reviewer");
           } else {
             router.push("/");
           }
