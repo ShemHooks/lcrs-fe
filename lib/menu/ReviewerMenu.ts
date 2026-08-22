@@ -21,7 +21,7 @@ export const ReviewerMenu = [
   },
   {
     name: "Records",
-    path: "",
+    path: "/reviewer/records",
     icon: Archive,
   },
 

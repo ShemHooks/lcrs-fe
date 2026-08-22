@@ -20,7 +20,7 @@ export default function Topbar() {
     return <div>Error loading user</div>;
   }
 
-  console.log(data.data.username);
+  sessionStorage.setItem("current_user_role", data.data.role);
 
   return (
     <header className="bg-white border-b border-emerald-900/5 h-16 flex justify-between items-center px-8 sticky top-0 z-40">

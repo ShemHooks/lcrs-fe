@@ -23,6 +23,8 @@ interface RecordsTableProps {
   isRefreshing: boolean;
 }
 
+const current_user_role = sessionStorage.getItem("current_user_role");
+
 export default function RecordsTable({
   records,
   recordType,
@@ -209,7 +211,17 @@ function BirthRecordRow({ record }: { record: BirthRegistrationRecord }) {
 
       <td className="px-5 py-4 text-right">
         <Button asChild size="sm" variant="outline">
-          <Link href={`/clerk/records/${record.id}`}>
+          <Link
+            href={
+              current_user_role === "Staff"
+                ? `/clerk/records/${record.id}`
+                : current_user_role === "Reviewer"
+                  ? `/reviewer/records/${record.id}`
+                  : current_user_role === "Admin"
+                    ? `/admin/records/${record.id}`
+                    : "/"
+            }
+          >
             <Eye className="mr-2 h-4 w-4" />
             View
           </Link>
