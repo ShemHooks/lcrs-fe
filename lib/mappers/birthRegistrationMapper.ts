@@ -33,6 +33,40 @@ export const emptyAddress = (): BirthRegistrationData["address"] => ({
 
 /**
  * =========================
+ * Safe JSON Parse Helper
+ * =========================
+ */
+
+/**
+ * The API currently returns address-like fields as JSON strings
+ * (e.g. `"{\"provinceName\":\"...\"}"`) instead of parsed objects.
+ *
+ * This normalizes either shape (string or already-parsed object)
+ * into a plain object so the rest of the mapper doesn't need to
+ * care which one it got. Falls back to `{}` on null/undefined/
+ * malformed input so downstream `??` fallbacks still work.
+ */
+const parseMaybeJson = (value: unknown): Record<string, any> => {
+  if (!value) return {};
+
+  if (typeof value === "object") {
+    return value as Record<string, any>;
+  }
+
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      console.warn("Failed to parse address JSON:", value);
+      return {};
+    }
+  }
+
+  return {};
+};
+
+/**
+ * =========================
  * Address Mapper
  * =========================
  */
@@ -58,22 +92,32 @@ const mapAddressToApi = (
  * The API only gives us province/city names, so the
  * selector codes will initially be empty.
  *
+ * Accepts either a JSON string or an already-parsed object
+ * (see `parseMaybeJson`), since the API currently sends
+ * address-like fields as stringified JSON.
+ *
  * If your backend eventually returns PSGC codes,
  * they can be populated here.
  */
-const mapAddressToForm = (address: any): BirthRegistrationData["address"] => ({
-  regionCode: address?.regionCode ?? "",
-  regionName: address?.regionName ?? "",
+const mapAddressToForm = (
+  address: unknown,
+): BirthRegistrationData["address"] => {
+  const parsed = parseMaybeJson(address);
 
-  provinceCode: address?.provinceCode ?? "",
-  provinceName: address?.provinceName ?? address?.province ?? "",
+  return {
+    regionCode: parsed.regionCode ?? "",
+    regionName: parsed.regionName ?? "",
 
-  cityCode: address?.cityCode ?? "",
-  cityName: address?.cityName ?? address?.city ?? "",
+    provinceCode: parsed.provinceCode ?? "",
+    provinceName: parsed.provinceName ?? parsed.province ?? "",
 
-  barangayCode: address?.barangayCode ?? "",
-  barangayName: address?.barangayName ?? "",
-});
+    cityCode: parsed.cityCode ?? "",
+    cityName: parsed.cityName ?? parsed.city ?? "",
+
+    barangayCode: parsed.barangayCode ?? "",
+    barangayName: parsed.barangayName ?? "",
+  };
+};
 
 /**
  * =========================
@@ -106,7 +150,7 @@ export const mapBirthRecordToFormData = (
   record: BirthRegistrationRecord,
 ): BirthRegistrationData => {
   return {
-    // Address
+    // Address (string or object, both handled)
     address: mapAddressToForm(record.address),
 
     // =========================
@@ -120,9 +164,7 @@ export const mapBirthRecordToFormData = (
     gender: record.child?.gender ?? "",
     childBirthDate: record.child?.birthDate ?? "",
 
-    placeOfBirth: record.child?.placeOfBirth
-      ? mapAddressToForm(record.child.placeOfBirth)
-      : emptyAddress(),
+    placeOfBirth: mapAddressToForm(record.child?.placeOfBirth),
 
     hospitalName: record.child?.hospitalName ?? "",
 
@@ -149,9 +191,7 @@ export const mapBirthRecordToFormData = (
     motherOccupation: record.mother?.occupation ?? "",
     motherAge: record.mother?.age ?? "",
 
-    motherResidence: record.mother?.residence
-      ? mapAddressToForm(record.mother.residence)
-      : emptyAddress(),
+    motherResidence: mapAddressToForm(record.mother?.residence),
 
     motherHouserOrSt: record.mother?.houseOrStreet ?? "",
 
@@ -169,9 +209,7 @@ export const mapBirthRecordToFormData = (
     fatherOccupation: record.father?.occupation ?? "",
     fatherAge: record.father?.age ?? "",
 
-    fatherResidence: record.father?.residence
-      ? mapAddressToForm(record.father.residence)
-      : emptyAddress(),
+    fatherResidence: mapAddressToForm(record.father?.residence),
 
     fatherHouseOrSt: record.father?.houseOrStreet ?? "",
 
@@ -181,9 +219,7 @@ export const mapBirthRecordToFormData = (
 
     marriageDate: record.parentsMarriage?.marriageDate ?? "",
 
-    marriagePlace: record.parentsMarriage?.marriagePlace
-      ? mapAddressToForm(record.parentsMarriage.marriagePlace)
-      : emptyAddress(),
+    marriagePlace: mapAddressToForm(record.parentsMarriage?.marriagePlace),
 
     marriageHouseOrSt: record.parentsMarriage?.houseOrStreet ?? "",
 
