@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { User, Lock, Bell } from "lucide-react";
 import SettingsPage from "@/components/reusable/SettingsPage";
 import SettingsCard from "@/components/reusable/SettingsCard";
@@ -11,25 +10,23 @@ const settingsItems = [
     icon: User,
     title: "My Profile",
     description: "Manage your personal information, avatar, and account details",
-    href: "/clerk/settings/profile",
+    href: "/reviewer/settings/profile",
   },
   {
     icon: Lock,
     title: "Password & Security",
     description: "Update your password and configure two-factor authentication",
-    href: "/clerk/settings/password&security",
+    href: "/reviewer/settings/password&security",
   },
   {
     icon: Bell,
     title: "Notifications",
     description: "Control how and when you receive notifications",
-    href: "/clerk/settings/notifications",
+    href: "/reviewer/settings/notifications",
   },
 ];
 
-export default function SettingsPageView() {
-  const router = useRouter();
-
+export default function ReviewerSettingsPage() {
   return (
     <SettingsPage
       title="Account Settings"
