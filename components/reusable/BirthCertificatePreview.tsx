@@ -587,7 +587,7 @@ export default function BirthCertificatePreview({
       {/* ====================================== */}
 
       {/* Month */}
-      <PreviewField value={marriageMonth} xPos={160} yPos={550} width={60} />
+      <PreviewField value={marriageMonth} xPos={140} yPos={550} width={70} />
 
       {/* Day */}
       <PreviewField value={marriageDay} xPos={220} yPos={550} width={40} />
@@ -596,14 +596,7 @@ export default function BirthCertificatePreview({
       <PreviewField value={marriageYear} xPos={270} yPos={550} width={60} />
 
       {/* Place */}
-      <PreviewField
-        value={marriagePlace}
-        xPos={350}
-        yPos={550}
-        width={440}
-        fontSize={9}
-        minFontSize={6}
-      />
+      <PreviewField value={marriagePlace} xPos={350} yPos={550} width={440} />
 
       {/* ====================================== */}
       {/* ATTENDANT */}
@@ -645,22 +638,18 @@ export default function BirthCertificatePreview({
       {/* Attendant Name */}
       <PreviewField
         value={childData.attendantName}
-        xPos={200}
-        yPos={658}
+        xPos={180}
+        yPos={662}
         width={250}
-        fontSize={12}
-        minFontSize={6}
       />
 
       {/* Attendant Address */}
       <PreviewField
         value={childData.attendantAddress}
         xPos={500}
-        yPos={640}
+        yPos={635}
         width={280}
         height={40}
-        fontSize={12}
-        minFontSize={6}
       />
 
       {/* Position */}
@@ -713,8 +702,6 @@ export default function BirthCertificatePreview({
         yPos={795}
         width={340}
         height={18}
-        fontSize={12}
-        minFontSize={5}
       />
 
       {/* Date */}

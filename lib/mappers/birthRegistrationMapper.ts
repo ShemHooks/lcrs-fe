@@ -12,6 +12,7 @@ import {
 export interface ApiAddress {
   provinceName: string;
   cityName: string;
+  barangayName: string;
 }
 
 /**
@@ -84,6 +85,7 @@ const mapAddressToApi = (
 ): ApiAddress => ({
   provinceName: address?.provinceName ?? "",
   cityName: address?.cityName ?? "",
+  barangayName: address?.barangayName ?? "",
 });
 
 /**
