@@ -1,6 +1,7 @@
 import api from "../config/api";
 
 export interface ReviewerJobItem {
+  certificateId: string;
   id: string;
   type: "Birth" | "Marriage" | "Death";
   subjectName: string;
@@ -32,7 +33,8 @@ export const getJobs = async (filters?: JobsFilters): Promise<JobsResponse> => {
   try {
     const params: Record<string, string> = {};
     if (filters?.type && filters.type !== "All") params.type = filters.type;
-    if (filters?.status && filters.status !== "All") params.status = filters.status;
+    if (filters?.status && filters.status !== "All")
+      params.status = filters.status;
 
     const response = await api.get<JobsResponse>("/api/jobs", { params });
     return response.data;
@@ -40,7 +42,7 @@ export const getJobs = async (filters?: JobsFilters): Promise<JobsResponse> => {
     throw new Error(
       error.response?.data?.message ??
         error.message ??
-        "Unable to load review jobs."
+        "Unable to load review jobs.",
     );
   }
 };

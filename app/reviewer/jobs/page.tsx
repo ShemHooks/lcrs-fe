@@ -62,9 +62,7 @@ export default function ReviewerJobsPage() {
     return (
       <JobsError
         message={
-          error instanceof Error
-            ? error.message
-            : "Unable to load review jobs."
+          error instanceof Error ? error.message : "Unable to load review jobs."
         }
         onRetry={() => refetch()}
         isRetrying={isFetching}
@@ -73,6 +71,8 @@ export default function ReviewerJobsPage() {
   }
 
   const count = data?.count ?? { pending: 0, returned: 0, approve: 0 };
+
+  console.log("jobs: ", jobs);
 
   return (
     <div className="space-y-6">
@@ -273,7 +273,7 @@ export default function ReviewerJobsPage() {
                             : undefined
                         }
                       >
-                        <Link href={`/reviewer/jobs/${job.id}`}>
+                        <Link href={`/reviewer/jobs/${job.certificateId}`}>
                           <Eye className="mr-2 h-4 w-4" />
 
                           {job.status === "Pending" ? "Review" : "View"}
