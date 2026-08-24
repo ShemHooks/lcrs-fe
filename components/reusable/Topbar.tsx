@@ -1,13 +1,18 @@
 "use client";
 
-import { Bell, User, LogOut, ChevronRight, Zap } from "lucide-react";
+import { User, LogOut, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { getProfile } from "@/server/hooks/authHooks";
+import NotificationBell from "./NotificationBell";
+import { useNotificationStream } from "@/server/hooks/notificationHooks";
 
 export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data, isLoading, isError, error } = getProfile();
+
+  // Establish SSE connection for real-time notifications
+  useNotificationStream();
 
   const currentPath =
     pathname.split("/").pop()?.replace(/-/g, " ") || "Dashboard";
@@ -40,12 +45,7 @@ export default function Topbar() {
 
       {/* Profile & Actions */}
       <div className="flex items-center gap-6">
-        <button className="relative text-emerald-900/100 over:text-emerald-600 transition-colors">
-          <Bell size={20} />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white">
-            3
-          </span>
-        </button>
+        <NotificationBell />
         <div className="h-8 w-[1px] bg-emerald-900/5" />
         <div className="flex items-center gap-4 group cursor-pointer">
           <div className="text-right">
