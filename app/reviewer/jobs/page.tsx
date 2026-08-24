@@ -4,9 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import {
+  AlertCircle,
   CheckCircle2,
   Clock3,
   Eye,
+  Loader2,
+  RefreshCcw,
   RotateCcw,
   Search,
   SlidersHorizontal,
@@ -16,84 +19,60 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { useJobs } from "@/server/hooks/jobsHooks";
+
 type JobStatus = "Pending" | "Returned" | "Approved";
-
-type ReviewerJob = {
-  id: string;
-  type: "Birth" | "Marriage" | "Death";
-  subjectName: string;
-  submittedBy: string;
-  submittedAt: string;
-  status: JobStatus;
-  reviewComment?: string;
-};
-
-const jobs: ReviewerJob[] = [
-  {
-    id: "1",
-    type: "Birth",
-    subjectName: "Juan Miguel Dela Cruz",
-    submittedBy: "Shem Regidor",
-    submittedAt: "2026-08-18T09:20:00",
-    status: "Pending",
-  },
-  {
-    id: "2",
-    type: "Birth",
-    subjectName: "Ana Marie Santos",
-    submittedBy: "Shem Regidor",
-    submittedAt: "2026-08-18T08:15:00",
-    status: "Pending",
-  },
-  {
-    id: "3",
-    type: "Marriage",
-    subjectName: "Carlos Reyes & Mae Villanueva",
-    submittedBy: "Maria Lopez",
-    submittedAt: "2026-08-17T15:30:00",
-    status: "Approved",
-  },
-  {
-    id: "4",
-    type: "Death",
-    subjectName: "Roberto Villanueva",
-    submittedBy: "John Santos",
-    submittedAt: "2026-08-17T13:10:00",
-    status: "Returned",
-    reviewComment: "Please verify the place of death.",
-  },
-];
 
 export default function ReviewerJobsPage() {
   const [status, setStatus] = useState<"All" | JobStatus>("Pending");
   const [recordType, setRecordType] = useState<
     "All" | "Birth" | "Marriage" | "Death"
   >("All");
-
   const [search, setSearch] = useState("");
 
-  const filteredJobs = useMemo(() => {
+  // API filters: only status and type trigger a server fetch
+  const apiFilters = useMemo(
+    () => ({
+      status: status === "All" ? undefined : status,
+      type: recordType === "All" ? undefined : recordType,
+    }),
+    [status, recordType],
+  );
+
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useJobs(apiFilters);
+
+  // Client-side keyword filter — instant, no API call
+  const allJobs = data?.data ?? [];
+  const jobs = useMemo(() => {
     const query = search.trim().toLowerCase();
+    if (!query) return allJobs;
+    return allJobs.filter(
+      (job) =>
+        job.subjectName?.toLowerCase().includes(query) ||
+        job.submittedBy?.toLowerCase().includes(query),
+    );
+  }, [allJobs, search]);
 
-    return jobs.filter((job) => {
-      const matchesStatus = status === "All" || job.status === status;
+  if (isLoading) {
+    return <JobsLoading />;
+  }
 
-      const matchesType = recordType === "All" || job.type === recordType;
+  if (isError) {
+    return (
+      <JobsError
+        message={
+          error instanceof Error
+            ? error.message
+            : "Unable to load review jobs."
+        }
+        onRetry={() => refetch()}
+        isRetrying={isFetching}
+      />
+    );
+  }
 
-      const matchesSearch =
-        !query ||
-        job.subjectName.toLowerCase().includes(query) ||
-        job.submittedBy.toLowerCase().includes(query);
-
-      return matchesStatus && matchesType && matchesSearch;
-    });
-  }, [status, recordType, search]);
-
-  const pendingCount = jobs.filter((job) => job.status === "Pending").length;
-
-  const returnedCount = jobs.filter((job) => job.status === "Returned").length;
-
-  const approvedCount = jobs.filter((job) => job.status === "Approved").length;
+  const count = data?.count ?? { pending: 0, returned: 0, approve: 0 };
 
   return (
     <div className="space-y-6">
@@ -117,7 +96,7 @@ export default function ReviewerJobsPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <SummaryCard
           title="Pending"
-          value={pendingCount}
+          value={count.pending}
           description="Waiting for review"
           icon={Clock3}
           className="text-amber-600"
@@ -125,7 +104,7 @@ export default function ReviewerJobsPage() {
 
         <SummaryCard
           title="Returned"
-          value={returnedCount}
+          value={count.returned}
           description="Returned for correction"
           icon={RotateCcw}
           className="text-red-600"
@@ -133,7 +112,7 @@ export default function ReviewerJobsPage() {
 
         <SummaryCard
           title="Approved"
-          value={approvedCount}
+          value={count.approve}
           description="Completed reviews"
           icon={CheckCircle2}
           className="text-emerald-600"
@@ -142,10 +121,27 @@ export default function ReviewerJobsPage() {
 
       {/* Controls */}
       <Card className="rounded-xl border border-slate-200 p-5">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5 text-[#92191d]" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-5 w-5 text-[#92191d]" />
 
-          <h2 className="font-semibold text-slate-900">Filter Review Jobs</h2>
+            <h2 className="font-semibold text-slate-900">Filter Review Jobs</h2>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isFetching}
+            onClick={() => refetch()}
+          >
+            {isFetching ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCcw className="mr-2 h-4 w-4" />
+            )}
+            Refresh
+          </Button>
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_220px]">
@@ -203,12 +199,11 @@ export default function ReviewerJobsPage() {
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
-            {filteredJobs.length} job
-            {filteredJobs.length !== 1 ? "s" : ""} found
+            {jobs.length} job{jobs.length !== 1 ? "s" : ""} found
           </p>
         </div>
 
-        {filteredJobs.length === 0 ? (
+        {jobs.length === 0 ? (
           <div className="p-12 text-center">
             <CheckCircle2 className="mx-auto h-9 w-9 text-slate-300" />
 
@@ -235,7 +230,7 @@ export default function ReviewerJobsPage() {
               </thead>
 
               <tbody className="divide-y">
-                {filteredJobs.map((job) => (
+                {jobs.map((job) => (
                   <tr key={job.id} className="transition hover:bg-slate-50">
                     <td className="px-5 py-4">
                       <RecordTypeBadge type={job.type} />
@@ -243,7 +238,7 @@ export default function ReviewerJobsPage() {
 
                     <td className="px-5 py-4">
                       <p className="font-medium text-slate-900">
-                        {job.subjectName}
+                        {job.subjectName || "Unknown subject"}
                       </p>
 
                       {job.reviewComment && (
@@ -254,7 +249,7 @@ export default function ReviewerJobsPage() {
                     </td>
 
                     <td className="px-5 py-4 text-slate-600">
-                      {job.submittedBy}
+                      {job.submittedBy || "Unknown clerk"}
                     </td>
 
                     <td className="px-5 py-4 text-slate-500">
@@ -328,8 +323,8 @@ function SummaryCard({
   );
 }
 
-function RecordTypeBadge({ type }: { type: ReviewerJob["type"] }) {
-  const styles = {
+function RecordTypeBadge({ type }: { type: string }) {
+  const styles: Record<string, string> = {
     Birth: "bg-blue-50 text-blue-700",
     Marriage: "bg-pink-50 text-pink-700",
     Death: "bg-slate-100 text-slate-700",
@@ -337,7 +332,9 @@ function RecordTypeBadge({ type }: { type: ReviewerJob["type"] }) {
 
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-xs font-medium ${styles[type]}`}
+      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+        styles[type] ?? "bg-slate-100 text-slate-700"
+      }`}
     >
       {type}
     </span>
@@ -374,4 +371,73 @@ function formatDateTime(value: string) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function JobsLoading() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+
+        <div className="mt-3 h-8 w-64 animate-pulse rounded bg-slate-200" />
+
+        <div className="mt-3 h-4 w-96 max-w-full animate-pulse rounded bg-slate-100" />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Card key={index} className="h-32 animate-pulse bg-slate-50" />
+        ))}
+      </div>
+
+      <Card className="h-[120px] animate-pulse bg-slate-50" />
+
+      <Card className="h-[300px] animate-pulse bg-slate-50" />
+    </div>
+  );
+}
+
+function JobsError({
+  message,
+  onRetry,
+  isRetrying,
+}: {
+  message: string;
+  onRetry: () => void;
+  isRetrying: boolean;
+}) {
+  return (
+    <div className="flex min-h-[400px] items-center justify-center">
+      <Card className="w-full max-w-lg p-6">
+        <div className="flex items-start gap-4">
+          <div className="rounded-full bg-red-50 p-3">
+            <AlertCircle className="h-6 w-6 text-red-600" />
+          </div>
+
+          <div className="flex-1">
+            <h2 className="font-semibold text-slate-900">
+              Unable to load review jobs
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">{message}</p>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4"
+              disabled={isRetrying}
+              onClick={onRetry}
+            >
+              {isRetrying ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="mr-2 h-4 w-4" />
+              )}
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
 }
