@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 
 import { useBirthRegistration } from "@/server/hooks/birthcertificateHooks";
 import { mapBirthRecordToFormData } from "@/lib/mappers/birthRegistrationMapper";
+import { getProfile } from "@/server/hooks/authHooks";
 
 export default function BirthRecordViewPage() {
   const params = useParams<{ id: string }>();
@@ -17,6 +18,11 @@ export default function BirthRecordViewPage() {
   const id = params.id;
 
   const { data, isLoading, isError, error } = useBirthRegistration(id);
+  const record = data?.data;
+
+  const { data: profileData } = getProfile();
+
+  const currentUser = profileData?.data;
 
   if (isLoading) {
     return (
@@ -108,7 +114,13 @@ export default function BirthRecordViewPage() {
       </div>
 
       <Card className="overflow-hidden p-5">
-        <BirthCertificatePreview childData={previewData} previewMode="record" />
+        <BirthCertificatePreview
+          childData={previewData}
+          previewMode="record"
+          preparedBy={record.preparedByUser}
+          preparedDate={record.createdAt}
+          receivedBy={currentUser}
+        />
       </Card>
     </div>
   );

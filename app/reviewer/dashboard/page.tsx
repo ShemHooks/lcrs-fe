@@ -245,7 +245,7 @@ export default function ReviewerDashboardPage() {
                             size="sm"
                             className="bg-[#92191d] text-white hover:bg-[#761216]"
                           >
-                            <Link href={`/reviewer/jobs/${job.id}`}>
+                            <Link href={`/reviewer/jobs/${job.certificate_id}`}>
                               Review
                             </Link>
                           </Button>

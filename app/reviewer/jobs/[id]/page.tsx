@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 
 import { useBirthRegistration } from "@/server/hooks/birthcertificateHooks";
 import { mapBirthRecordToFormData } from "@/lib/mappers/birthRegistrationMapper";
+import { getProfile } from "@/server/hooks/authHooks";
 
 export default function JobReviewPage() {
   const params = useParams<{ id: string }>();
@@ -26,6 +27,10 @@ export default function JobReviewPage() {
   const [returnReason, setReturnReason] = useState("");
 
   const record = data?.data;
+
+  const { data: profileData } = getProfile();
+
+  const currentUser = profileData?.data;
 
   if (isLoading) {
     return (
@@ -187,7 +192,13 @@ export default function JobReviewPage() {
 
       {/* Certificate */}
       <Card className="overflow-x-auto p-5">
-        <BirthCertificatePreview childData={previewData} previewMode="record" />
+        <BirthCertificatePreview
+          childData={previewData}
+          previewMode="record"
+          preparedBy={record.preparedByUser}
+          preparedDate={record.createdAt}
+          receivedBy={currentUser}
+        />
       </Card>
 
       {/* Action error */}
