@@ -1,6 +1,6 @@
 import {
   BirthRegistrationData,
-  BirthRegistrationRecord,
+  // BirthRegistrationRecord,
 } from "@/lib/types/birth-registration";
 
 /**

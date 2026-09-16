@@ -5,9 +5,27 @@ import FormPreviewContainer from "./FormPreviewContainer";
 import { BirthRegistrationData } from "@/lib/types/birth-registration";
 import { getProfile } from "@/server/hooks/authHooks";
 
+interface PreparedByUser {
+  id?: string;
+  first_name?: string;
+  last_name?: string;
+  position?: string;
+}
+
 interface BirthCertificatePreviewProps {
   childData: BirthRegistrationData;
   previewMode?: "registration" | "record";
+
+  preparedBy?: PreparedByUser | null;
+
+  preparedDate?: string | null;
+
+  receivedBy?: {
+    id?: string;
+    first_name?: string;
+    last_name?: string;
+    position?: string;
+  } | null;
 }
 
 /**
@@ -132,6 +150,9 @@ const CertificateField = ({
 export default function BirthCertificatePreview({
   childData,
   previewMode = "registration",
+  preparedBy,
+  preparedDate,
+  receivedBy,
 }: BirthCertificatePreviewProps) {
   const fontScale = previewMode === "record" ? 16 / 12 : 1;
 
@@ -276,20 +297,44 @@ export default function BirthCertificatePreview({
   /**
    * Logged-in staff information
    */
-  const { data } = getProfile();
+  const { data: profileData } = getProfile();
+
+  const currentUser = profileData?.data;
+
+  const preparedByUser = preparedBy ?? currentUser;
+
+  const preparedByName = preparedByUser
+    ? `${preparedByUser.first_name ?? ""} ${
+        preparedByUser.last_name ?? ""
+      }`.trim()
+    : "";
 
   /**
    * Prepared date
    */
-  const today = new Date();
+  const formattedPreparedDate = preparedDate
+    ? new Date(preparedDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
-  const formattedToday = today.toLocaleDateString("en-US", {
+  // reciever data
+
+  const receivedByName = receivedBy
+    ? `${receivedBy.first_name ?? ""} ${receivedBy.last_name ?? ""}`.trim()
+    : "";
+
+  const formattedReceivedDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-
-  console.log("child data: ", childData);
 
   return (
     <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
@@ -719,35 +764,58 @@ export default function BirthCertificatePreview({
 
       {/* Name */}
       <PreviewField
-        value={
-          data?.data
-            ? `${data.data.first_name ?? ""} ${
-                data.data.last_name ?? ""
-              }`.trim()
-            : ""
-        }
+        value={preparedByName}
         xPos={560}
         yPos={760}
         width={230}
         fontSize={12}
         minFontSize={6}
       />
-
       {/* Position */}
       <PreviewField
-        value={data?.data?.position}
+        value={preparedByUser?.position ?? ""}
         xPos={560}
         yPos={780}
         width={230}
         fontSize={12}
         minFontSize={6}
       />
-
-      {/* Date */}
+      {/* prepared dat */}
       <PreviewField
-        value={formattedToday}
+        value={formattedPreparedDate}
         xPos={510}
         yPos={800}
+        width={280}
+        fontSize={12}
+        minFontSize={6}
+      />
+
+      {/* ====================================== */}
+      {/* RECEIVED BY */}
+      {/* ====================================== */}
+
+      <PreviewField
+        value={receivedByName}
+        xPos={180}
+        yPos={860}
+        width={250}
+        fontSize={12}
+        minFontSize={6}
+      />
+
+      <PreviewField
+        value={receivedBy?.position ?? ""}
+        xPos={180}
+        yPos={880}
+        width={250}
+        fontSize={12}
+        minFontSize={6}
+      />
+
+      <PreviewField
+        value={formattedReceivedDate}
+        xPos={150}
+        yPos={900}
         width={280}
         fontSize={12}
         minFontSize={6}
