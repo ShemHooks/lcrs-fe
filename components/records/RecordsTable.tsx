@@ -53,9 +53,12 @@ export default function RecordsTable({
 
   const filteredRecords = records.filter((record) => {
     /**
-     * For now the API only contains
-     * birth records.
+     * Only display successfully registered records.
+     * A record is considered registered once it has
+     * been assigned a registry number.
      */
+    const isRegistered = Boolean(record.registryNumber?.trim());
+
     const matchesType = recordType === "all" || recordType === "birth";
 
     const fullName = [
@@ -74,7 +77,7 @@ export default function RecordsTable({
       fullName.includes(normalizedSearch) ||
       registryNumber.includes(normalizedSearch);
 
-    return matchesType && matchesSearch;
+    return isRegistered && matchesType && matchesSearch;
   });
 
   return (
@@ -173,7 +176,7 @@ function BirthRecordRow({ record }: { record: BirthRegistrationRecord }) {
     <tr className="transition hover:bg-slate-50">
       <td className="px-5 py-4">
         <span className="font-mono text-xs text-slate-700">
-          {record.registryNumber || "Not assigned"}
+          {record.registryNumber}
         </span>
       </td>
 

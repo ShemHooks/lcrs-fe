@@ -45,7 +45,7 @@ export default function Topbar() {
 
       {/* Profile & Actions */}
       <div className="flex items-center gap-6">
-        <NotificationBell />
+        {/* <NotificationBell /> */}
         <div className="h-8 w-[1px] bg-emerald-900/5" />
         <div className="flex items-center gap-4 group cursor-pointer">
           <div className="text-right">

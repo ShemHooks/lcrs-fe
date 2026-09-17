@@ -6,6 +6,7 @@ import {
   Archive,
   BarChart3,
   Download,
+  ClipboardList,
 } from "lucide-react";
 
 export const ReviewerMenu = [
@@ -17,7 +18,7 @@ export const ReviewerMenu = [
   {
     name: "Jobs",
     path: "/reviewer/jobs",
-    icon: FileText,
+    icon: ClipboardList,
   },
   {
     name: "Records",

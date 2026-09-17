@@ -6,6 +6,7 @@ import {
   Archive,
   BarChart3,
   Download,
+  ClipboardList,
 } from "lucide-react";
 
 export const clerkMenu = [
@@ -18,6 +19,11 @@ export const clerkMenu = [
     name: "Registration",
     path: "/clerk/registration",
     icon: FileText,
+  },
+  {
+    name: "Jobs",
+    path: "/clerk/jobs",
+    icon: ClipboardList,
   },
   {
     name: "Records",

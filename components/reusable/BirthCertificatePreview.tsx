@@ -2,30 +2,22 @@
 
 import React from "react";
 import FormPreviewContainer from "./FormPreviewContainer";
-import { BirthRegistrationData } from "@/lib/types/birth-registration";
-import { getProfile } from "@/server/hooks/authHooks";
 
-interface PreparedByUser {
-  id?: string;
-  first_name?: string;
-  last_name?: string;
-  position?: string;
-}
+import {
+  BirthRegistrationData,
+  CertificateUserData,
+} from "@/lib/types/birth-registration";
 
 interface BirthCertificatePreviewProps {
   childData: BirthRegistrationData;
+
   previewMode?: "registration" | "record";
 
-  preparedBy?: PreparedByUser | null;
-
+  preparedBy?: CertificateUserData | null;
   preparedDate?: string | null;
 
-  receivedBy?: {
-    id?: string;
-    first_name?: string;
-    last_name?: string;
-    position?: string;
-  } | null;
+  receivedBy?: CertificateUserData | null;
+  receivedDate?: string | null;
 }
 
 /**
@@ -83,6 +75,7 @@ const CertificateField = ({
    */
   const calculateFontSize = () => {
     const scaledFontSize = fontSize * fontScale;
+
     const scaledMinFontSize = minFontSize * fontScale;
 
     if (!width || !stringValue) {
@@ -153,12 +146,14 @@ export default function BirthCertificatePreview({
   preparedBy,
   preparedDate,
   receivedBy,
+  receivedDate,
 }: BirthCertificatePreviewProps) {
   const fontScale = previewMode === "record" ? 16 / 12 : 1;
 
   const PreviewField = (props: CertificateFieldProps) => (
     <CertificateField {...props} fontScale={fontScale} />
   );
+
   /**
    * Converts:
    *
@@ -295,46 +290,61 @@ export default function BirthCertificatePreview({
   };
 
   /**
-   * Logged-in staff information
+   * Format database timestamps for
+   * certificate display.
    */
-  const { data: profileData } = getProfile();
+  const formatCertificateDate = (value?: string | null) => {
+    if (!value) return "";
 
-  const currentUser = profileData?.data;
+    const date = new Date(value);
 
-  const preparedByUser = preparedBy ?? currentUser;
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
 
-  const preparedByName = preparedByUser
-    ? `${preparedByUser.first_name ?? ""} ${
-        preparedByUser.last_name ?? ""
-      }`.trim()
-    : "";
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   /**
-   * Prepared date
+   * ======================================
+   * PREPARED BY
+   * ======================================
+   *
+   * The parent component determines who
+   * prepared the certificate.
+   *
+   * BirthCertificatePreview does not read
+   * the currently authenticated user.
    */
-  const formattedPreparedDate = preparedDate
-    ? new Date(preparedDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-
-  // reciever data
-
-  const receivedByName = receivedBy
-    ? `${receivedBy.first_name ?? ""} ${receivedBy.last_name ?? ""}`.trim()
+  const preparedByName = preparedBy
+    ? [preparedBy.first_name, preparedBy.last_name].filter(Boolean).join(" ")
     : "";
 
-  const formattedReceivedDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedPreparedDate = formatCertificateDate(preparedDate);
+
+  /**
+   * ======================================
+   * RECEIVED BY
+   * ======================================
+   *
+   * During review:
+   * receivedBy = current reviewer
+   *
+   * Returned transaction:
+   * receivedBy = transaction reviewer
+   *
+   * Approved record:
+   * receivedBy = persisted receivedByUser
+   */
+  const receivedByName = receivedBy
+    ? [receivedBy.first_name, receivedBy.last_name].filter(Boolean).join(" ")
+    : "";
+
+  const formattedReceivedDate = formatCertificateDate(receivedDate);
 
   return (
     <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
@@ -771,16 +781,18 @@ export default function BirthCertificatePreview({
         fontSize={12}
         minFontSize={6}
       />
+
       {/* Position */}
       <PreviewField
-        value={preparedByUser?.position ?? ""}
+        value={preparedBy?.position ?? ""}
         xPos={560}
         yPos={780}
         width={230}
         fontSize={12}
         minFontSize={6}
       />
-      {/* prepared dat */}
+
+      {/* Prepared Date */}
       <PreviewField
         value={formattedPreparedDate}
         xPos={510}
@@ -794,6 +806,7 @@ export default function BirthCertificatePreview({
       {/* RECEIVED BY */}
       {/* ====================================== */}
 
+      {/* Name */}
       <PreviewField
         value={receivedByName}
         xPos={180}
@@ -803,6 +816,7 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
+      {/* Position */}
       <PreviewField
         value={receivedBy?.position ?? ""}
         xPos={180}
@@ -812,6 +826,7 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
+      {/* Received Date */}
       <PreviewField
         value={formattedReceivedDate}
         xPos={150}
