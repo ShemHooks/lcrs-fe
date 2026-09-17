@@ -28,7 +28,7 @@ export const ReviewerMenu = [
 
   {
     name: "Analytics",
-    path: "",
+    path: "/reviewer/analytics",
     icon: BarChart3,
   },
 
