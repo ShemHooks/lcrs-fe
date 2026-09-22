@@ -15,7 +15,11 @@ import BirthCertificatePreview from "@/components/reusable/BirthCertificatePrevi
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-import { useBirthRegistration } from "@/server/hooks/birthcertificateHooks";
+import {
+  useBirthRegistration,
+  useApproveBirthRegistration,
+} from "@/server/hooks/birthcertificateHooks";
+
 import { mapBirthRecordToFormData } from "@/lib/mappers/birthRegistrationMapper";
 import { getProfile } from "@/server/hooks/authHooks";
 import { useReturnJob } from "@/server/hooks/jobsHooks";
@@ -33,8 +37,8 @@ export default function JobReviewPage() {
   const { data: profileData } = getProfile();
 
   const returnJobMutation = useReturnJob();
+  const approveBirthRegistrationMutation = useApproveBirthRegistration();
 
-  const [approveLoading, setApproveLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const [showReturnModal, setShowReturnModal] = useState(false);
@@ -43,8 +47,11 @@ export default function JobReviewPage() {
   const record = data?.data;
   const currentUser = profileData?.data;
 
+  const isApproving = approveBirthRegistrationMutation.isPending;
+
   const isReturning = returnJobMutation.isPending;
-  const isActionLoading = approveLoading || isReturning;
+
+  const isActionLoading = isApproving || isReturning;
 
   if (isLoading) {
     return (
@@ -111,30 +118,33 @@ export default function JobReviewPage() {
   // Convert API record into the format expected by BirthCertificatePreview.
   const previewData = mapBirthRecordToFormData(record);
 
+  // ============================================================
+  // APPROVE
+  // ============================================================
+
   const handleApprove = async () => {
-    setApproveLoading(true);
+    if (isActionLoading) {
+      return;
+    }
+
     setActionError(null);
 
     try {
-      const res = await fetch(`/api/reviewer/jobs/${certificateId}/approve`, {
-        method: "POST",
+      await approveBirthRegistrationMutation.mutateAsync({
+        certificateId,
       });
-
-      if (!res.ok) {
-        const result = await res.json().catch(() => null);
-
-        throw new Error(result?.message ?? "Failed to approve job.");
-      }
 
       router.push("/reviewer/jobs");
     } catch (err) {
       setActionError(
         err instanceof Error ? err.message : "Failed to approve job.",
       );
-    } finally {
-      setApproveLoading(false);
     }
   };
+
+  // ============================================================
+  // RETURN
+  // ============================================================
 
   const handleReturn = async () => {
     const reason = returnReason.trim();
@@ -280,7 +290,7 @@ export default function JobReviewPage() {
               disabled={isActionLoading}
               className="bg-[#92191d] hover:bg-[#7c1518]"
             >
-              {approveLoading ? (
+              {isApproving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Approving...

@@ -18,7 +18,11 @@ import { Card } from "@/components/ui/card";
 import AddressSelector from "@/components/reusable/AddressSelector";
 import { FloatingInput } from "@/components/reusable/FloatingInput";
 
-import { useBirthRegistration } from "@/server/hooks/birthcertificateHooks";
+import {
+  useBirthRegistration,
+  useUpdateBirthRegistration,
+} from "@/server/hooks/birthcertificateHooks";
+
 import { useClerkJobs } from "@/server/hooks/jobsHooks";
 
 import { mapBirthRecordToFormData } from "@/lib/mappers/birthRegistrationMapper";
@@ -289,7 +293,11 @@ function CorrectionForm({
   certificateId: string;
   initialData: BirthRegistrationData;
 }) {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<BirthRegistrationData>(initialData);
+
+  const updateBirthRegistrationMutation = useUpdateBirthRegistration();
 
   const updateField = (
     field: keyof BirthRegistrationData,
@@ -303,12 +311,21 @@ function CorrectionForm({
 
   const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
 
-  const handleSaveAndResubmit = () => {
-    console.log("Certificate:", certificateId);
-    console.log("Original data:", initialData);
-    console.log("Corrected data:", formData);
+  const handleSaveAndResubmit = async () => {
+    if (!hasChanges || updateBirthRegistrationMutation.isPending) {
+      return;
+    }
 
-    // API WILL BE CONNECTED NEXT.
+    try {
+      await updateBirthRegistrationMutation.mutateAsync({
+        id: certificateId,
+        payload: formData,
+      });
+
+      router.push(`/clerk/jobs/${certificateId}`);
+    } catch (error) {
+      console.error("Failed to update and resubmit birth registration:", error);
+    }
   };
 
   return (
@@ -856,11 +873,15 @@ function CorrectionForm({
 
             <Button
               type="button"
-              disabled={!hasChanges}
+              disabled={
+                !hasChanges || updateBirthRegistrationMutation.isPending
+              }
               onClick={handleSaveAndResubmit}
               className="bg-[#92191d] text-white hover:bg-[#761216]"
             >
-              Save & Resubmit
+              {updateBirthRegistrationMutation.isPending
+                ? "Saving & Resubmitting..."
+                : "Save & Resubmit"}
             </Button>
           </div>
         </div>

@@ -36,11 +36,11 @@ export const clerkMenu = [
     path: "/clerk/analytics",
     icon: BarChart3,
   },
-  {
-    name: "Forms",
-    path: "/clerk/forms",
-    icon: Download,
-  },
+  // {
+  //   name: "Forms",
+  //   path: "/clerk/forms",
+  //   icon: Download,
+  // },
   {
     name: "Settings",
     path: "/clerk/settings",

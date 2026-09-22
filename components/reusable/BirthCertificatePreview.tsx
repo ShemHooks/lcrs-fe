@@ -11,20 +11,40 @@ import {
 interface BirthCertificatePreviewProps {
   childData: BirthRegistrationData;
 
-  previewMode?: "registration" | "record";
+  previewMode?: "registration" | "record" | "print";
 
   preparedBy?: CertificateUserData | null;
   preparedDate?: string | null;
 
   receivedBy?: CertificateUserData | null;
   receivedDate?: string | null;
+
+  registrar?: CertificateUserData | null;
+  registrarDate?: string | null;
+
+  registryNumber?: string | null;
 }
 
-/**
- * Coordinates are based on the original certificate image:
- * width  = 850
- * height = 1100
- */
+/* ============================================================
+   CERTIFICATE COORDINATE SYSTEM
+
+   IMPORTANT:
+   All coordinates below are based on the original
+   birth_form.jpg coordinate system:
+
+   850 × 1100
+
+   DO NOT convert the individual xPos/yPos values.
+
+   Screen:
+   - background form + database values
+
+   Print:
+   - database values only
+   - no background form
+   - same coordinate system
+   ============================================================ */
+
 const CERTIFICATE_WIDTH = 850;
 const CERTIFICATE_HEIGHT = 1100;
 
@@ -53,40 +73,33 @@ interface CertificateFieldProps {
 
 const CertificateField = ({
   value,
+
   xPos,
   yPos,
+
   width,
   height = 20,
+
   fontSize = 12,
   minFontSize = 6,
   fontScale = 1,
+
   center = false,
   bold = false,
+
   className = "",
 }: CertificateFieldProps) => {
   const stringValue =
     typeof value === "string" || typeof value === "number" ? String(value) : "";
 
-  /**
-   * Estimate whether text needs to shrink.
-   *
-   * This avoids long names/addresses overflowing into
-   * neighboring certificate fields.
-   */
   const calculateFontSize = () => {
     const scaledFontSize = fontSize * fontScale;
-
     const scaledMinFontSize = minFontSize * fontScale;
 
     if (!width || !stringValue) {
       return scaledFontSize;
     }
 
-    /*
-     * Rough estimate of how many characters fit in the field.
-     * The selected preview mode is included in the calculation so
-     * larger record-preview text still shrinks when necessary.
-     */
     const estimatedCharacters = width / (scaledFontSize * 0.55);
 
     if (stringValue.length <= estimatedCharacters) {
@@ -140,41 +153,52 @@ const CertificateField = ({
   );
 };
 
-export default function BirthCertificatePreview({
+/* ============================================================
+   CERTIFICATE DATA OVERLAY
+
+   This component contains ONLY the database values.
+
+   It is shared by:
+   - screen preview
+   - physical printing
+
+   That means screen and print always use the same coordinates.
+   ============================================================ */
+
+interface CertificateOverlayProps extends BirthCertificatePreviewProps {
+  fontScale: number;
+}
+
+function CertificateOverlay({
   childData,
-  previewMode = "registration",
+
   preparedBy,
   preparedDate,
+
   receivedBy,
   receivedDate,
-}: BirthCertificatePreviewProps) {
-  const fontScale = previewMode === "record" ? 16 / 12 : 1;
 
+  registrar,
+  registrarDate,
+
+  registryNumber,
+
+  fontScale,
+}: CertificateOverlayProps) {
   const PreviewField = (props: CertificateFieldProps) => (
     <CertificateField {...props} fontScale={fontScale} />
   );
 
-  /**
-   * Converts:
-   *
-   * "City Of Kabankalan"
-   *
-   * to:
-   *
-   * "Kabankalan City"
-   */
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+
   const formatCityName = (cityName?: string) => {
     if (!cityName) return "";
 
     return cityName.replace(/^City Of\s+/i, "") + " City";
   };
 
-  /**
-   * Build an address as one single string.
-   *
-   * This is important because rendering each address
-   * part using separate flex children caused overflow.
-   */
   const buildAddress = (
     houseOrStreet: string,
     address: {
@@ -194,9 +218,10 @@ export default function BirthCertificatePreview({
       .join(", ");
   };
 
-  /**
-   * Place of birth
-   */
+  /* ============================================================
+     PLACE OF BIRTH
+     ============================================================ */
+
   const placeOfBirth = [
     childData.hospitalName,
     childData.placeOfBirth.barangayName,
@@ -206,25 +231,24 @@ export default function BirthCertificatePreview({
     .filter(Boolean)
     .join(", ");
 
-  /**
-   * Mother's residence
-   */
+  /* ============================================================
+     ADDRESSES
+     ============================================================ */
+
   const motherAddress = buildAddress(
     childData.motherHouserOrSt,
     childData.motherResidence,
   );
 
-  /**
-   * Father's residence
-   */
   const fatherAddress = buildAddress(
     childData.fatherHouseOrSt,
     childData.fatherResidence,
   );
 
-  /**
-   * Place of marriage
-   */
+  /* ============================================================
+     MARRIAGE PLACE
+     ============================================================ */
+
   const marriagePlace = [
     formatCityName(childData.marriagePlace.cityName),
     childData.marriagePlace.provinceName,
@@ -233,9 +257,10 @@ export default function BirthCertificatePreview({
     .filter(Boolean)
     .join(", ");
 
-  /**
-   * Child birth date
-   */
+  /* ============================================================
+     CHILD BIRTH DATE
+     ============================================================ */
+
   const birthDate = childData.childBirthDate
     ? new Date(childData.childBirthDate)
     : null;
@@ -252,9 +277,10 @@ export default function BirthCertificatePreview({
 
   const year = isValidDate ? birthDate.getFullYear() : "";
 
-  /**
-   * Parents' marriage date
-   */
+  /* ============================================================
+     PARENTS' MARRIAGE DATE
+     ============================================================ */
+
   const parentMarriageDate = childData.marriageDate
     ? new Date(childData.marriageDate)
     : null;
@@ -274,11 +300,10 @@ export default function BirthCertificatePreview({
     ? parentMarriageDate.getFullYear()
     : "";
 
-  /**
-   * Convert 24-hour time into readable time.
-   *
-   * 14:30 -> 2:30
-   */
+  /* ============================================================
+     TIME
+     ============================================================ */
+
   const formatTime = (time: string) => {
     if (!time) return "";
 
@@ -289,10 +314,10 @@ export default function BirthCertificatePreview({
     return `${displayHour}:${minutes.toString().padStart(2, "0")}`;
   };
 
-  /**
-   * Format database timestamps for
-   * certificate display.
-   */
+  /* ============================================================
+     CERTIFICATE DATE
+     ============================================================ */
+
   const formatCertificateDate = (value?: string | null) => {
     if (!value) return "";
 
@@ -309,48 +334,49 @@ export default function BirthCertificatePreview({
     });
   };
 
-  /**
-   * ======================================
-   * PREPARED BY
-   * ======================================
-   *
-   * The parent component determines who
-   * prepared the certificate.
-   *
-   * BirthCertificatePreview does not read
-   * the currently authenticated user.
-   */
+  /* ============================================================
+     PREPARED BY
+     ============================================================ */
+
   const preparedByName = preparedBy
     ? [preparedBy.first_name, preparedBy.last_name].filter(Boolean).join(" ")
     : "";
 
   const formattedPreparedDate = formatCertificateDate(preparedDate);
 
-  /**
-   * ======================================
-   * RECEIVED BY
-   * ======================================
-   *
-   * During review:
-   * receivedBy = current reviewer
-   *
-   * Returned transaction:
-   * receivedBy = transaction reviewer
-   *
-   * Approved record:
-   * receivedBy = persisted receivedByUser
-   */
+  /* ============================================================
+     RECEIVED BY
+     ============================================================ */
+
   const receivedByName = receivedBy
     ? [receivedBy.first_name, receivedBy.last_name].filter(Boolean).join(" ")
     : "";
 
   const formattedReceivedDate = formatCertificateDate(receivedDate);
 
+  /* ============================================================
+     REGISTRAR
+     ============================================================ */
+
+  const registrarName = registrar
+    ? [registrar.first_name, registrar.last_name].filter(Boolean).join(" ")
+    : "";
+
+  const formattedRegistrarDate = registrarDate
+    ? formatCertificateDate(registrarDate)
+    : new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+  /* ============================================================
+     DATA OVERLAY
+     ============================================================ */
+
   return (
-    <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
-      {/* ====================================== */}
+    <>
       {/* REGISTRATION ADDRESS */}
-      {/* ====================================== */}
 
       <PreviewField
         value={childData.address.provinceName}
@@ -366,11 +392,10 @@ export default function BirthCertificatePreview({
         width={400}
       />
 
-      {/* ====================================== */}
-      {/* CHILD */}
-      {/* ====================================== */}
+      <PreviewField value={registryNumber} xPos={600} yPos={120} width={200} />
 
-      {/* First Name */}
+      {/* CHILD */}
+
       <PreviewField
         value={childData.childFirstName}
         xPos={180}
@@ -378,7 +403,6 @@ export default function BirthCertificatePreview({
         width={190}
       />
 
-      {/* Middle Name */}
       <PreviewField
         value={childData.childMiddleName}
         xPos={400}
@@ -386,7 +410,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Last Name */}
       <PreviewField
         value={childData.childLastName}
         xPos={600}
@@ -394,7 +417,6 @@ export default function BirthCertificatePreview({
         width={190}
       />
 
-      {/* Sex */}
       <PreviewField
         value={childData.gender}
         xPos={150}
@@ -402,18 +424,13 @@ export default function BirthCertificatePreview({
         width={130}
       />
 
-      {/* Birth Day */}
       <PreviewField value={day} xPos={450} yPos={188} width={70} />
 
-      {/* Birth Month */}
       <PreviewField value={month} xPos={570} yPos={188} width={100} />
 
-      {/* Birth Year */}
       <PreviewField value={year} xPos={700} yPos={188} width={100} />
 
-      {/* ====================================== */}
       {/* PLACE OF BIRTH */}
-      {/* ====================================== */}
 
       <PreviewField
         value={placeOfBirth}
@@ -426,11 +443,8 @@ export default function BirthCertificatePreview({
         bold
       />
 
-      {/* ====================================== */}
       {/* BIRTH INFORMATION */}
-      {/* ====================================== */}
 
-      {/* Type */}
       <PreviewField
         value={childData.typeOfBirth}
         xPos={190}
@@ -438,7 +452,6 @@ export default function BirthCertificatePreview({
         width={140}
       />
 
-      {/* Multiple birth order */}
       <PreviewField
         value={childData.multipleBirthOrder}
         xPos={360}
@@ -446,7 +459,6 @@ export default function BirthCertificatePreview({
         width={150}
       />
 
-      {/* Birth order */}
       <PreviewField
         value={childData.birthOrder}
         xPos={540}
@@ -454,7 +466,6 @@ export default function BirthCertificatePreview({
         width={120}
       />
 
-      {/* Weight */}
       <PreviewField
         value={childData.weight}
         xPos={690}
@@ -462,11 +473,8 @@ export default function BirthCertificatePreview({
         width={100}
       />
 
-      {/* ====================================== */}
       {/* MOTHER */}
-      {/* ====================================== */}
 
-      {/* First */}
       <PreviewField
         value={childData.motherFirstName}
         xPos={200}
@@ -474,7 +482,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Middle */}
       <PreviewField
         value={childData.motherMiddleName}
         xPos={400}
@@ -482,7 +489,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Last */}
       <PreviewField
         value={childData.motherLastName}
         xPos={600}
@@ -490,7 +496,6 @@ export default function BirthCertificatePreview({
         width={190}
       />
 
-      {/* Citizenship */}
       <PreviewField
         value={childData.motherCitizenship}
         xPos={200}
@@ -498,7 +503,6 @@ export default function BirthCertificatePreview({
         width={200}
       />
 
-      {/* Religion */}
       <PreviewField
         value={childData.motherReligion}
         xPos={600}
@@ -506,7 +510,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Total children */}
       <PreviewField
         value={childData.totalNumOfChildren}
         xPos={120}
@@ -514,7 +517,6 @@ export default function BirthCertificatePreview({
         width={60}
       />
 
-      {/* Children living */}
       <PreviewField
         value={childData.noOfChildrenAlive}
         xPos={200}
@@ -522,7 +524,6 @@ export default function BirthCertificatePreview({
         width={100}
       />
 
-      {/* Children dead */}
       <PreviewField
         value={childData.noOfChildrenDead}
         xPos={380}
@@ -530,7 +531,6 @@ export default function BirthCertificatePreview({
         width={80}
       />
 
-      {/* Occupation */}
       <PreviewField
         value={childData.motherOccupation}
         xPos={500}
@@ -538,7 +538,6 @@ export default function BirthCertificatePreview({
         width={150}
       />
 
-      {/* Age */}
       <PreviewField
         value={childData.motherAge}
         xPos={710}
@@ -546,10 +545,7 @@ export default function BirthCertificatePreview({
         width={70}
       />
 
-      {/* ====================================== */}
       {/* MOTHER RESIDENCE */}
-      {/* FIXED OVERFLOW ISSUE HERE */}
-      {/* ====================================== */}
 
       <PreviewField
         value={motherAddress}
@@ -562,11 +558,8 @@ export default function BirthCertificatePreview({
         bold
       />
 
-      {/* ====================================== */}
       {/* FATHER */}
-      {/* ====================================== */}
 
-      {/* First */}
       <PreviewField
         value={childData.fatherFirstName}
         xPos={200}
@@ -574,7 +567,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Middle */}
       <PreviewField
         value={childData.fatherMiddleName}
         xPos={400}
@@ -582,7 +574,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Last */}
       <PreviewField
         value={childData.fatherLastName}
         xPos={600}
@@ -590,7 +581,6 @@ export default function BirthCertificatePreview({
         width={190}
       />
 
-      {/* Citizenship */}
       <PreviewField
         value={childData.fatherCitizenship}
         xPos={170}
@@ -598,7 +588,6 @@ export default function BirthCertificatePreview({
         width={120}
       />
 
-      {/* Religion */}
       <PreviewField
         value={childData.fatherReligion}
         xPos={300}
@@ -606,7 +595,6 @@ export default function BirthCertificatePreview({
         width={180}
       />
 
-      {/* Occupation */}
       <PreviewField
         value={childData.fatherOccupation}
         xPos={530}
@@ -614,7 +602,6 @@ export default function BirthCertificatePreview({
         width={130}
       />
 
-      {/* Age */}
       <PreviewField
         value={childData.fatherAge}
         xPos={700}
@@ -622,9 +609,7 @@ export default function BirthCertificatePreview({
         width={80}
       />
 
-      {/* ====================================== */}
       {/* FATHER RESIDENCE */}
-      {/* ====================================== */}
 
       <PreviewField
         value={fatherAddress}
@@ -637,27 +622,18 @@ export default function BirthCertificatePreview({
         bold
       />
 
-      {/* ====================================== */}
       {/* MARRIAGE */}
-      {/* ====================================== */}
 
-      {/* Month */}
       <PreviewField value={marriageMonth} xPos={140} yPos={550} width={70} />
 
-      {/* Day */}
       <PreviewField value={marriageDay} xPos={220} yPos={550} width={40} />
 
-      {/* Year */}
       <PreviewField value={marriageYear} xPos={270} yPos={550} width={60} />
 
-      {/* Place */}
       <PreviewField value={marriagePlace} xPos={350} yPos={550} width={440} />
 
-      {/* ====================================== */}
       {/* ATTENDANT */}
-      {/* ====================================== */}
 
-      {/* Attendant Type X Marker */}
       {childData.attendantType && (
         <PreviewField
           value="X"
@@ -682,7 +658,6 @@ export default function BirthCertificatePreview({
         />
       )}
 
-      {/* Certification Time */}
       <PreviewField
         value={formatTime(childData.attendantCertificationTime)}
         xPos={500}
@@ -690,7 +665,6 @@ export default function BirthCertificatePreview({
         width={100}
       />
 
-      {/* Attendant Name */}
       <PreviewField
         value={childData.attendantName}
         xPos={180}
@@ -698,7 +672,6 @@ export default function BirthCertificatePreview({
         width={250}
       />
 
-      {/* Attendant Address */}
       <PreviewField
         value={childData.attendantAddress}
         xPos={500}
@@ -707,7 +680,6 @@ export default function BirthCertificatePreview({
         height={40}
       />
 
-      {/* Position */}
       <PreviewField
         value={childData.attendantPosition}
         xPos={200}
@@ -717,7 +689,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Certification Date */}
       <PreviewField
         value={childData.attendantCertificationDate}
         xPos={500}
@@ -726,11 +697,8 @@ export default function BirthCertificatePreview({
         fontSize={12}
       />
 
-      {/* ====================================== */}
       {/* INFORMANT */}
-      {/* ====================================== */}
 
-      {/* Name */}
       <PreviewField
         value={childData.informantName}
         xPos={150}
@@ -740,7 +708,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Relationship */}
       <PreviewField
         value={childData.informantRelationship}
         xPos={200}
@@ -750,7 +717,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Address */}
       <PreviewField
         value={childData.informantAddress}
         xPos={110}
@@ -759,7 +725,6 @@ export default function BirthCertificatePreview({
         height={18}
       />
 
-      {/* Date */}
       <PreviewField
         value={childData.informantDate}
         xPos={100}
@@ -768,11 +733,8 @@ export default function BirthCertificatePreview({
         fontSize={12}
       />
 
-      {/* ====================================== */}
       {/* PREPARED BY */}
-      {/* ====================================== */}
 
-      {/* Name */}
       <PreviewField
         value={preparedByName}
         xPos={560}
@@ -782,7 +744,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Position */}
       <PreviewField
         value={preparedBy?.position ?? ""}
         xPos={560}
@@ -792,7 +753,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Prepared Date */}
       <PreviewField
         value={formattedPreparedDate}
         xPos={510}
@@ -802,11 +762,8 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* ====================================== */}
       {/* RECEIVED BY */}
-      {/* ====================================== */}
 
-      {/* Name */}
       <PreviewField
         value={receivedByName}
         xPos={180}
@@ -816,7 +773,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Position */}
       <PreviewField
         value={receivedBy?.position ?? ""}
         xPos={180}
@@ -826,7 +782,6 @@ export default function BirthCertificatePreview({
         minFontSize={6}
       />
 
-      {/* Received Date */}
       <PreviewField
         value={formattedReceivedDate}
         xPos={150}
@@ -835,6 +790,164 @@ export default function BirthCertificatePreview({
         fontSize={12}
         minFontSize={6}
       />
-    </FormPreviewContainer>
+
+      {/* REGISTRAR */}
+
+      <PreviewField
+        value={registrarName}
+        xPos={560}
+        yPos={860}
+        width={230}
+        fontSize={12}
+        minFontSize={6}
+      />
+
+      <PreviewField
+        value={registrar?.position ?? ""}
+        xPos={560}
+        yPos={880}
+        width={230}
+        fontSize={12}
+        minFontSize={6}
+      />
+
+      <PreviewField
+        value={formattedRegistrarDate}
+        xPos={510}
+        yPos={900}
+        width={280}
+        fontSize={12}
+        minFontSize={6}
+      />
+    </>
+  );
+}
+
+/* ============================================================
+   MAIN COMPONENT
+   ============================================================ */
+
+export default function BirthCertificatePreview({
+  childData,
+
+  previewMode = "registration",
+
+  preparedBy,
+  preparedDate,
+
+  receivedBy,
+  receivedDate,
+
+  registrar,
+  registrarDate,
+
+  registryNumber,
+}: BirthCertificatePreviewProps) {
+  /*
+   * Record mode is intentionally easier to read.
+   *
+   * Print uses the original font scale because it must
+   * match the physical form.
+   */
+  const fontScale = previewMode === "record" ? 16 / 12 : 1;
+
+  const overlayProps = {
+    childData,
+
+    preparedBy,
+    preparedDate,
+
+    receivedBy,
+    receivedDate,
+
+    registrar,
+    registrarDate,
+
+    registryNumber,
+
+    fontScale,
+  };
+
+  /* ============================================================
+     PRINT MODE
+
+     IMPORTANT:
+     NO birth_form.jpg here.
+
+     The office already has the physical Form 102.
+     Only database values are sent to the printer.
+     ============================================================ */
+
+  if (previewMode === "print") {
+    return (
+      <div
+        className="birth-certificate-print-overlay"
+        data-preview-mode="print"
+      >
+        <CertificateOverlay {...overlayProps} />
+
+        <style jsx global>{`
+          @media print {
+            .birth-certificate-print-overlay {
+              position: relative !important;
+
+              /*
+               * Coordinate canvas.
+               *
+               * The physical sizing/scaling is controlled
+               * by the outer .birth-print-sheet.
+               */
+              width: 100% !important;
+              height: 100% !important;
+
+              margin: 0 !important;
+              padding: 0 !important;
+
+              border: 0 !important;
+              box-shadow: none !important;
+
+              overflow: visible !important;
+
+              background: transparent !important;
+
+              transform: none !important;
+            }
+
+            .birth-certificate-print-overlay .birth-font {
+              color: #000 !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  /* ============================================================
+     SCREEN PREVIEW
+
+     Keep the actual Form 102 background inside the application.
+     ============================================================ */
+
+  return (
+    <div className="birth-certificate-preview" data-preview-mode={previewMode}>
+      <FormPreviewContainer imageSrc="/assets/birth_form.jpg">
+        <CertificateOverlay {...overlayProps} />
+      </FormPreviewContainer>
+
+      <style jsx global>{`
+        /*
+         * SCREEN ONLY.
+         *
+         * Do NOT put physical print dimensions here.
+         * Printing is controlled by the page/global print CSS.
+         */
+
+        .birth-certificate-preview {
+          width: 100%;
+        }
+      `}</style>
+    </div>
   );
 }

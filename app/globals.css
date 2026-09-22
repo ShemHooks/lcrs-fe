@@ -121,9 +121,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -133,6 +135,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(400%);
   }
@@ -146,4 +149,101 @@
   font-family: "Times New Roman", Times, serif;
   font-weight: 700;
   letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   SCREEN
+   ============================================================ */
+
+#print-root {
+  display: none;
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+
+@media print {
+  @page {
+    size: 8.5in 13in;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 8.5in !important;
+    height: 13in !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-root,
+  #print-root * {
+    visibility: visible !important;
+  }
+
+  #print-root {
+    display: block !important;
+
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 8.5in !important;
+    height: 13in !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    background: white !important;
+
+    z-index: 2147483647 !important;
+  }
+
+  .birth-print-sheet {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 8.5in !important;
+    height: 13in !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    background: transparent !important;
+  }
+
+  .birth-certificate-print-overlay {
+    position: relative !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    background: transparent !important;
+  }
+
+  .birth-font {
+    color: black !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 }

@@ -6,6 +6,7 @@ import {
   Archive,
   BarChart3,
   Download,
+  ClipboardList,
 } from "lucide-react";
 
 export const adminMenu = [
@@ -14,10 +15,15 @@ export const adminMenu = [
     path: "/admin/dashboard",
     icon: LayoutDashboard,
   },
+  // {
+  //   name: "Registration",
+  //   path: "/admin/registration",
+  //   icon: FileText,
+  // },
   {
-    name: "Registration",
-    path: "/admin/registration",
-    icon: FileText,
+    name: "Jobs",
+    path: "/admin/jobs",
+    icon: ClipboardList,
   },
   {
     name: "Records",
@@ -34,11 +40,11 @@ export const adminMenu = [
     path: "/admin/analytics",
     icon: BarChart3,
   },
-  {
-    name: "Forms",
-    path: "/admin/forms",
-    icon: Download,
-  },
+  // {
+  //   name: "Forms",
+  //   path: "/admin/forms",
+  //   icon: Download,
+  // },
   {
     name: "Settings",
     path: "/admin/settings",
