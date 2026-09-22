@@ -2,7 +2,8 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
+
+import { AlertCircle, ArrowLeft, Loader2, Printer } from "lucide-react";
 
 import BirthCertificatePreview from "@/components/reusable/BirthCertificatePreview";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,17 @@ import { mapBirthRecordToFormData } from "@/lib/mappers/birthRegistrationMapper"
 
 export default function BirthRecordViewPage() {
   const params = useParams<{ id: string }>();
-
   const id = params.id;
 
   const { data, isLoading, isError, error } = useBirthRegistration(id);
+
+  // ============================================================
+  // PRINT
+  // ============================================================
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   // ============================================================
   // LOADING
@@ -101,56 +109,94 @@ export default function BirthRecordViewPage() {
   const previewData = mapBirthRecordToFormData(record);
 
   // ============================================================
+  // SHARED CERTIFICATE DATA
+  // ============================================================
+
+  const certificateProps = {
+    childData: previewData,
+
+    preparedBy: record.preparedByUser,
+    preparedDate: record.createdAt,
+
+    receivedBy: record.receivedByUser,
+    receivedDate: record.updatedAt,
+
+    registrar: record.registrar,
+
+    registryNumber: record.registryNumber,
+  };
+
+  // ============================================================
   // PAGE
   // ============================================================
 
   return (
-    <div className="space-y-6">
+    <>
       {/* ====================================================== */}
-      {/* HEADER */}
+      {/* NORMAL SCREEN PAGE */}
       {/* ====================================================== */}
 
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#92191d]">
-            Civil Registry Record
-          </p>
+      <div className="screen-only space-y-6">
+        {/* ==================================================== */}
+        {/* HEADER */}
+        {/* ==================================================== */}
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
-            Birth Certificate Record
-          </h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#92191d]">
+              Civil Registry Record
+            </p>
 
-          <p className="mt-1 text-sm text-slate-500">
-            View the registered birth certificate information.
-          </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+              Birth Certificate Record
+            </h1>
+
+            <p className="mt-1 text-sm text-slate-500">
+              View the registered birth certificate information.
+            </p>
+          </div>
+
+          {/* ================================================== */}
+          {/* ACTIONS */}
+          {/* ================================================== */}
+
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/clerk/records">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Records
+              </Link>
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handlePrint}
+              className="bg-[#92191d] text-white hover:bg-[#7a1518]"
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              Print Certificate
+            </Button>
+          </div>
         </div>
 
-        <Button asChild variant="outline">
-          <Link href="/clerk/records">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Records
-          </Link>
-        </Button>
+        {/* ==================================================== */}
+        {/* SCREEN CERTIFICATE */}
+        {/* ==================================================== */}
+
+        <Card className="overflow-hidden p-5">
+          <BirthCertificatePreview {...certificateProps} previewMode="record" />
+        </Card>
       </div>
 
       {/* ====================================================== */}
-      {/* CERTIFICATE */}
+      {/* PRINT CERTIFICATE */}
       {/* ====================================================== */}
 
-      <Card className="overflow-hidden p-5">
-        <BirthCertificatePreview
-          childData={previewData}
-          previewMode="record"
-          // Clerk who originally prepared the certificate
-          preparedBy={record.preparedByUser}
-          preparedDate={record.createdAt}
-          // Reviewer who approved/received the certificate
-          receivedBy={record.receivedByUser}
-          receivedDate={record.updatedAt}
-          // Registrar who officially registered the certificate
-          registrar={record.registrar}
-        />
-      </Card>
-    </div>
+      <div id="print-root">
+        <div className="birth-print-sheet">
+          <BirthCertificatePreview {...certificateProps} previewMode="print" />
+        </div>
+      </div>
+    </>
   );
 }

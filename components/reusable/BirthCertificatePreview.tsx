@@ -28,35 +28,63 @@ interface BirthCertificatePreviewProps {
 /* ============================================================
    CERTIFICATE COORDINATE SYSTEM
 
-   IMPORTANT:
-   All coordinates below are based on the original
-   birth_form.jpg coordinate system:
-
+   Original birth_form.jpg:
    850 × 1100
 
-   DO NOT convert the individual xPos/yPos values.
-
-   Screen:
-   - background form + database values
-
-   Print:
-   - database values only
-   - no background form
-   - same coordinate system
+   IMPORTANT:
+   - Screen preview uses original coordinates.
+   - Print mode can use separate xPrintPos / yPrintPos coordinates.
+   - If print coordinates are omitted, xPos / yPos are used as fallback.
    ============================================================ */
 
 const CERTIFICATE_WIDTH = 850;
 const CERTIFICATE_HEIGHT = 1100;
 
-const x = (value: number) => `${(value / CERTIFICATE_WIDTH) * 100}%`;
+// Physical print canvas: 8.5 × 13 inches.
+// Using 850 × 1300 keeps the same calibration unit:
+// 100 coordinate units = 1 physical inch.
+const PRINT_CERTIFICATE_WIDTH = 850;
+const PRINT_CERTIFICATE_HEIGHT = 1300;
 
+const x = (value: number) => `${(value / CERTIFICATE_WIDTH) * 100}%`;
 const y = (value: number) => `${(value / CERTIFICATE_HEIGHT) * 100}%`;
+
+const printX = (value: number) => `${(value / PRINT_CERTIFICATE_WIDTH) * 100}%`;
+
+const printY = (value: number) =>
+  `${(value / PRINT_CERTIFICATE_HEIGHT) * 100}%`;
+
+/* ============================================================
+   PHYSICAL PRINT CALIBRATION
+
+   All certificate fields below now define physical print coordinates.
+
+   Global OFFSET values remain available to move the entire
+   printed overlay after individual fields have been calibrated.
+
+   PRINT_OFFSET_Y = -10 moves ALL printed fields upward.
+   PRINT_OFFSET_X = 5 moves ALL printed fields to the right.
+
+   These values use the original 850 × 1100 coordinate system.
+   ============================================================ */
+
+const PRINT_OFFSET_X = 0;
+const PRINT_OFFSET_Y = 0;
+
+/* ============================================================
+   FIELD
+   ============================================================ */
 
 interface CertificateFieldProps {
   value?: React.ReactNode;
 
   xPos: number;
   yPos: number;
+
+  // Optional coordinates used only when printing.
+  // If omitted, print mode falls back to xPos / yPos.
+  xPrintPos?: number;
+  yPrintPos?: number;
 
   width?: number;
   height?: number;
@@ -69,6 +97,8 @@ interface CertificateFieldProps {
   bold?: boolean;
 
   className?: string;
+
+  isPrint?: boolean;
 }
 
 const CertificateField = ({
@@ -76,6 +106,9 @@ const CertificateField = ({
 
   xPos,
   yPos,
+
+  xPrintPos,
+  yPrintPos,
 
   width,
   height = 20,
@@ -88,9 +121,15 @@ const CertificateField = ({
   bold = false,
 
   className = "",
+
+  isPrint = false,
 }: CertificateFieldProps) => {
   const stringValue =
     typeof value === "string" || typeof value === "number" ? String(value) : "";
+
+  /* ========================================================
+     FONT SIZE
+     ======================================================== */
 
   const calculateFontSize = () => {
     const scaledFontSize = fontSize * fontScale;
@@ -113,23 +152,38 @@ const CertificateField = ({
 
   const actualFontSize = calculateFontSize();
 
+  /* ========================================================
+     PRINT COORDINATE CALIBRATION
+     ======================================================== */
+
+  const finalX = isPrint ? (xPrintPos ?? xPos) + PRINT_OFFSET_X : xPos;
+
+  const finalY = isPrint ? (yPrintPos ?? yPos) + PRINT_OFFSET_Y : yPos;
+
+  /*
+   * Width/height stay based on the original coordinate
+   * system for now. We only calibrate field positions.
+   */
+  const finalWidth = width;
+  const finalHeight = height;
+
   return (
     <span
       className={`absolute birth-font ${className}`}
       title={stringValue || undefined}
       style={{
-        top: y(yPos),
-        left: x(xPos),
+        top: isPrint ? printY(finalY) : y(finalY),
+        left: isPrint ? printX(finalX) : x(finalX),
 
-        ...(width
+        ...(finalWidth
           ? {
-              width: x(width),
+              width: isPrint ? printX(finalWidth) : x(finalWidth),
             }
           : {}),
 
-        ...(height
+        ...(finalHeight
           ? {
-              height: y(height),
+              height: isPrint ? printY(finalHeight) : y(finalHeight),
             }
           : {}),
 
@@ -156,17 +210,17 @@ const CertificateField = ({
 /* ============================================================
    CERTIFICATE DATA OVERLAY
 
-   This component contains ONLY the database values.
+   Screen:
+   Original coordinates.
 
-   It is shared by:
-   - screen preview
-   - physical printing
-
-   That means screen and print always use the same coordinates.
+   Print:
+   Same fields, using xPrintPos / yPrintPos when provided.
+   Otherwise the normal xPos / yPos coordinates are used.
    ============================================================ */
 
 interface CertificateOverlayProps extends BirthCertificatePreviewProps {
   fontScale: number;
+  isPrint?: boolean;
 }
 
 function CertificateOverlay({
@@ -184,9 +238,10 @@ function CertificateOverlay({
   registryNumber,
 
   fontScale,
+  isPrint = false,
 }: CertificateOverlayProps) {
   const PreviewField = (props: CertificateFieldProps) => (
-    <CertificateField {...props} fontScale={fontScale} />
+    <CertificateField {...props} fontScale={fontScale} isPrint={isPrint} />
   );
 
   /* ============================================================
@@ -376,12 +431,16 @@ function CertificateOverlay({
 
   return (
     <>
+      {/* ====================================================== */}
       {/* REGISTRATION ADDRESS */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.address.provinceName}
         xPos={150}
         yPos={100}
+        xPrintPos={180}
+        yPrintPos={135}
         width={450}
       />
 
@@ -389,17 +448,30 @@ function CertificateOverlay({
         value={formatCityName(childData.address.cityName)}
         xPos={190}
         yPos={120}
+        xPrintPos={200}
+        yPrintPos={150}
         width={400}
       />
 
-      <PreviewField value={registryNumber} xPos={600} yPos={120} width={200} />
+      <PreviewField
+        value={registryNumber}
+        xPos={600}
+        yPos={120}
+        yPrintPos={150}
+        xPrintPos={700}
+        width={200}
+      />
 
+      {/* ====================================================== */}
       {/* CHILD */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.childFirstName}
         xPos={180}
         yPos={160}
+        xPrintPos={175}
+        yPrintPos={190}
         width={190}
       />
 
@@ -407,6 +479,8 @@ function CertificateOverlay({
         value={childData.childMiddleName}
         xPos={400}
         yPos={160}
+        xPrintPos={420}
+        yPrintPos={190}
         width={180}
       />
 
@@ -414,6 +488,8 @@ function CertificateOverlay({
         value={childData.childLastName}
         xPos={600}
         yPos={160}
+        xPrintPos={640}
+        yPrintPos={190}
         width={190}
       />
 
@@ -421,21 +497,48 @@ function CertificateOverlay({
         value={childData.gender}
         xPos={150}
         yPos={188}
+        xPrintPos={150}
+        yPrintPos={230}
         width={130}
       />
 
-      <PreviewField value={day} xPos={450} yPos={188} width={70} />
+      <PreviewField
+        value={day}
+        xPos={450}
+        yPos={188}
+        yPrintPos={230}
+        xPrintPos={465}
+        width={70}
+      />
 
-      <PreviewField value={month} xPos={570} yPos={188} width={100} />
+      <PreviewField
+        value={month}
+        xPos={570}
+        yPos={188}
+        yPrintPos={230}
+        xPrintPos={590}
+        width={100}
+      />
 
-      <PreviewField value={year} xPos={700} yPos={188} width={100} />
+      <PreviewField
+        value={year}
+        xPos={700}
+        yPos={188}
+        yPrintPos={230}
+        xPrintPos={740}
+        width={100}
+      />
 
+      {/* ====================================================== */}
       {/* PLACE OF BIRTH */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={placeOfBirth}
         xPos={90}
         yPos={220}
+        yPrintPos={280}
+        xPrintPos={140}
         width={700}
         height={22}
         fontSize={12}
@@ -443,12 +546,16 @@ function CertificateOverlay({
         bold
       />
 
+      {/* ====================================================== */}
       {/* BIRTH INFORMATION */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.typeOfBirth}
         xPos={190}
         yPos={265}
+        yPrintPos={335}
+        xPrintPos={180}
         width={140}
       />
 
@@ -456,6 +563,8 @@ function CertificateOverlay({
         value={childData.multipleBirthOrder}
         xPos={360}
         yPos={265}
+        yPrintPos={335}
+        xPrintPos={360}
         width={150}
       />
 
@@ -463,6 +572,8 @@ function CertificateOverlay({
         value={childData.birthOrder}
         xPos={540}
         yPos={265}
+        yPrintPos={335}
+        xPrintPos={600}
         width={120}
       />
 
@@ -470,15 +581,21 @@ function CertificateOverlay({
         value={childData.weight}
         xPos={690}
         yPos={265}
+        yPrintPos={335}
+        xPrintPos={735}
         width={100}
       />
 
+      {/* ====================================================== */}
       {/* MOTHER */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.motherFirstName}
         xPos={200}
         yPos={300}
+        yPrintPos={370}
+        xPrintPos={190}
         width={180}
       />
 
@@ -486,6 +603,8 @@ function CertificateOverlay({
         value={childData.motherMiddleName}
         xPos={400}
         yPos={300}
+        yPrintPos={370}
+        xPrintPos={410}
         width={180}
       />
 
@@ -493,6 +612,8 @@ function CertificateOverlay({
         value={childData.motherLastName}
         xPos={600}
         yPos={300}
+        yPrintPos={370}
+        xPrintPos={685}
         width={190}
       />
 
@@ -500,6 +621,8 @@ function CertificateOverlay({
         value={childData.motherCitizenship}
         xPos={200}
         yPos={325}
+        yPrintPos={415}
+        xPrintPos={200}
         width={200}
       />
 
@@ -507,6 +630,8 @@ function CertificateOverlay({
         value={childData.motherReligion}
         xPos={600}
         yPos={325}
+        yPrintPos={415}
+        xPrintPos={600}
         width={180}
       />
 
@@ -514,6 +639,8 @@ function CertificateOverlay({
         value={childData.totalNumOfChildren}
         xPos={120}
         yPos={370}
+        yPrintPos={460}
+        xPrintPos={120}
         width={60}
       />
 
@@ -521,6 +648,8 @@ function CertificateOverlay({
         value={childData.noOfChildrenAlive}
         xPos={200}
         yPos={370}
+        yPrintPos={460}
+        xPrintPos={250}
         width={100}
       />
 
@@ -528,6 +657,8 @@ function CertificateOverlay({
         value={childData.noOfChildrenDead}
         xPos={380}
         yPos={370}
+        yPrintPos={460}
+        xPrintPos={380}
         width={80}
       />
 
@@ -535,6 +666,8 @@ function CertificateOverlay({
         value={childData.motherOccupation}
         xPos={500}
         yPos={367}
+        yPrintPos={460}
+        xPrintPos={510}
         width={150}
       />
 
@@ -542,15 +675,21 @@ function CertificateOverlay({
         value={childData.motherAge}
         xPos={710}
         yPos={367}
+        yPrintPos={460}
+        xPrintPos={760}
         width={70}
       />
 
+      {/* ====================================================== */}
       {/* MOTHER RESIDENCE */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={motherAddress}
         xPos={80}
         yPos={400}
+        yPrintPos={500}
+        xPrintPos={200}
         width={720}
         height={21}
         fontSize={12}
@@ -558,12 +697,16 @@ function CertificateOverlay({
         bold
       />
 
+      {/* ====================================================== */}
       {/* FATHER */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.fatherFirstName}
         xPos={200}
         yPos={430}
+        yPrintPos={541}
+        xPrintPos={170}
         width={180}
       />
 
@@ -571,6 +714,8 @@ function CertificateOverlay({
         value={childData.fatherMiddleName}
         xPos={400}
         yPos={430}
+        yPrintPos={541}
+        xPrintPos={405}
         width={180}
       />
 
@@ -578,6 +723,8 @@ function CertificateOverlay({
         value={childData.fatherLastName}
         xPos={600}
         yPos={430}
+        yPrintPos={541}
+        xPrintPos={690}
         width={190}
       />
 
@@ -585,6 +732,8 @@ function CertificateOverlay({
         value={childData.fatherCitizenship}
         xPos={170}
         yPos={470}
+        yPrintPos={590}
+        xPrintPos={170}
         width={120}
       />
 
@@ -592,6 +741,8 @@ function CertificateOverlay({
         value={childData.fatherReligion}
         xPos={300}
         yPos={470}
+        yPrintPos={590}
+        xPrintPos={300}
         width={180}
       />
 
@@ -599,6 +750,8 @@ function CertificateOverlay({
         value={childData.fatherOccupation}
         xPos={530}
         yPos={470}
+        yPrintPos={590}
+        xPrintPos={550}
         width={130}
       />
 
@@ -606,15 +759,21 @@ function CertificateOverlay({
         value={childData.fatherAge}
         xPos={700}
         yPos={472}
+        yPrintPos={590}
+        xPrintPos={760}
         width={80}
       />
 
+      {/* ====================================================== */}
       {/* FATHER RESIDENCE */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={fatherAddress}
         xPos={80}
         yPos={500}
+        yPrintPos={637}
+        xPrintPos={140}
         width={720}
         height={21}
         fontSize={12}
@@ -622,17 +781,49 @@ function CertificateOverlay({
         bold
       />
 
+      {/* ====================================================== */}
       {/* MARRIAGE */}
+      {/* ====================================================== */}
 
-      <PreviewField value={marriageMonth} xPos={140} yPos={550} width={70} />
+      <PreviewField
+        value={marriageMonth}
+        xPos={140}
+        yPos={550}
+        yPrintPos={695}
+        xPrintPos={140}
+        width={70}
+      />
 
-      <PreviewField value={marriageDay} xPos={220} yPos={550} width={40} />
+      <PreviewField
+        value={marriageDay}
+        xPos={220}
+        yPos={550}
+        yPrintPos={695}
+        xPrintPos={220}
+        width={40}
+      />
 
-      <PreviewField value={marriageYear} xPos={270} yPos={550} width={60} />
+      <PreviewField
+        value={marriageYear}
+        xPos={270}
+        yPos={550}
+        yPrintPos={695}
+        xPrintPos={270}
+        width={60}
+      />
 
-      <PreviewField value={marriagePlace} xPos={350} yPos={550} width={440} />
+      <PreviewField
+        value={marriagePlace}
+        xPos={350}
+        yPos={550}
+        yPrintPos={695}
+        xPrintPos={370}
+        width={440}
+      />
 
+      {/* ====================================================== */}
       {/* ATTENDANT */}
+      {/* ====================================================== */}
 
       {childData.attendantType && (
         <PreviewField
@@ -650,7 +841,21 @@ function CertificateOverlay({
                       ? 580
                       : 0
           }
+          xPrintPos={
+            childData.attendantType === "Physician"
+              ? 90
+              : childData.attendantType === "Nurse"
+                ? 200
+                : childData.attendantType === "Midwife"
+                  ? 290
+                  : childData.attendantType === "Hilot"
+                    ? 390
+                    : childData.attendantType === "Others"
+                      ? 600
+                      : 0
+          }
           yPos={590}
+          yPrintPos={745}
           width={20}
           fontSize={12}
           bold
@@ -662,6 +867,8 @@ function CertificateOverlay({
         value={formatTime(childData.attendantCertificationTime)}
         xPos={500}
         yPos={620}
+        yPrintPos={788}
+        xPrintPos={520}
         width={100}
       />
 
@@ -669,6 +876,8 @@ function CertificateOverlay({
         value={childData.attendantName}
         xPos={180}
         yPos={662}
+        yPrintPos={844}
+        xPrintPos={180}
         width={250}
       />
 
@@ -676,6 +885,8 @@ function CertificateOverlay({
         value={childData.attendantAddress}
         xPos={500}
         yPos={635}
+        yPrintPos={805}
+        xPrintPos={510}
         width={280}
         height={40}
       />
@@ -684,6 +895,8 @@ function CertificateOverlay({
         value={childData.attendantPosition}
         xPos={200}
         yPos={680}
+        yPrintPos={868}
+        xPrintPos={200}
         width={220}
         fontSize={12}
         minFontSize={6}
@@ -693,16 +906,22 @@ function CertificateOverlay({
         value={childData.attendantCertificationDate}
         xPos={500}
         yPos={680}
+        yPrintPos={868}
+        xPrintPos={505}
         width={200}
         fontSize={12}
       />
 
+      {/* ====================================================== */}
       {/* INFORMANT */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={childData.informantName}
         xPos={150}
         yPos={760}
+        yPrintPos={960}
+        xPrintPos={170}
         width={280}
         fontSize={12}
         minFontSize={6}
@@ -712,6 +931,8 @@ function CertificateOverlay({
         value={childData.informantRelationship}
         xPos={200}
         yPos={775}
+        yPrintPos={984}
+        xPrintPos={220}
         width={200}
         fontSize={12}
         minFontSize={6}
@@ -721,6 +942,8 @@ function CertificateOverlay({
         value={childData.informantAddress}
         xPos={110}
         yPos={795}
+        yPrintPos={1012}
+        xPrintPos={130}
         width={340}
         height={18}
       />
@@ -729,16 +952,22 @@ function CertificateOverlay({
         value={childData.informantDate}
         xPos={100}
         yPos={810}
+        yPrintPos={1030}
+        xPrintPos={120}
         width={200}
         fontSize={12}
       />
 
+      {/* ====================================================== */}
       {/* PREPARED BY */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={preparedByName}
         xPos={560}
         yPos={760}
+        yPrintPos={960}
+        xPrintPos={560}
         width={230}
         fontSize={12}
         minFontSize={6}
@@ -748,6 +977,8 @@ function CertificateOverlay({
         value={preparedBy?.position ?? ""}
         xPos={560}
         yPos={780}
+        yPrintPos={984}
+        xPrintPos={560}
         width={230}
         fontSize={12}
         minFontSize={6}
@@ -757,17 +988,23 @@ function CertificateOverlay({
         value={formattedPreparedDate}
         xPos={510}
         yPos={800}
+        yPrintPos={1008}
+        xPrintPos={510}
         width={280}
         fontSize={12}
         minFontSize={6}
       />
 
+      {/* ====================================================== */}
       {/* RECEIVED BY */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={receivedByName}
         xPos={180}
         yPos={860}
+        yPrintPos={1089}
+        xPrintPos={180}
         width={250}
         fontSize={12}
         minFontSize={6}
@@ -777,6 +1014,8 @@ function CertificateOverlay({
         value={receivedBy?.position ?? ""}
         xPos={180}
         yPos={880}
+        yPrintPos={1113}
+        xPrintPos={180}
         width={250}
         fontSize={12}
         minFontSize={6}
@@ -786,17 +1025,23 @@ function CertificateOverlay({
         value={formattedReceivedDate}
         xPos={150}
         yPos={900}
+        yPrintPos={1137}
+        xPrintPos={150}
         width={280}
         fontSize={12}
         minFontSize={6}
       />
 
+      {/* ====================================================== */}
       {/* REGISTRAR */}
+      {/* ====================================================== */}
 
       <PreviewField
         value={registrarName}
         xPos={560}
         yPos={860}
+        yPrintPos={1089}
+        xPrintPos={560}
         width={230}
         fontSize={12}
         minFontSize={6}
@@ -806,6 +1051,8 @@ function CertificateOverlay({
         value={registrar?.position ?? ""}
         xPos={560}
         yPos={880}
+        yPrintPos={1113}
+        xPrintPos={560}
         width={230}
         fontSize={12}
         minFontSize={6}
@@ -815,6 +1062,8 @@ function CertificateOverlay({
         value={formattedRegistrarDate}
         xPos={510}
         yPos={900}
+        yPrintPos={1137}
+        xPrintPos={510}
         width={280}
         fontSize={12}
         minFontSize={6}
@@ -844,10 +1093,10 @@ export default function BirthCertificatePreview({
   registryNumber,
 }: BirthCertificatePreviewProps) {
   /*
-   * Record mode is intentionally easier to read.
+   * Record mode is intentionally larger/easier to read.
    *
-   * Print uses the original font scale because it must
-   * match the physical form.
+   * Print uses original font size because it needs to line up
+   * with the physical Form 102.
    */
   const fontScale = previewMode === "record" ? 16 / 12 : 1;
 
@@ -866,16 +1115,19 @@ export default function BirthCertificatePreview({
     registryNumber,
 
     fontScale,
+
+    /*
+     * IMPORTANT:
+     * Physical calibration is applied ONLY in print mode.
+     */
+    isPrint: previewMode === "print",
   };
 
   /* ============================================================
      PRINT MODE
 
-     IMPORTANT:
-     NO birth_form.jpg here.
-
-     The office already has the physical Form 102.
-     Only database values are sent to the printer.
+     No birth_form.jpg.
+     Only database values are printed onto the physical Form 102.
      ============================================================ */
 
   if (previewMode === "print") {
@@ -888,17 +1140,30 @@ export default function BirthCertificatePreview({
 
         <style jsx global>{`
           @media print {
+            /*
+             * IMPORTANT:
+             * Form 102 is being printed on the configured 8.5 × 13 sheet.
+             * Override the old 11-inch .birth-print-sheet child height so
+             * yPrintPos values above 1100 are not clipped.
+             */
+            .birth-print-sheet {
+              width: 8.5in !important;
+              height: 13in !important;
+              min-height: 13in !important;
+              max-height: 13in !important;
+              overflow: visible !important;
+            }
+
+            .birth-print-sheet > .birth-certificate-print-overlay,
             .birth-certificate-print-overlay {
               position: relative !important;
 
-              /*
-               * Coordinate canvas.
-               *
-               * The physical sizing/scaling is controlled
-               * by the outer .birth-print-sheet.
-               */
-              width: 100% !important;
-              height: 100% !important;
+              width: 8.5in !important;
+              height: 13in !important;
+              min-width: 8.5in !important;
+              min-height: 13in !important;
+              max-width: 8.5in !important;
+              max-height: 13in !important;
 
               margin: 0 !important;
               padding: 0 !important;
@@ -927,7 +1192,8 @@ export default function BirthCertificatePreview({
   /* ============================================================
      SCREEN PREVIEW
 
-     Keep the actual Form 102 background inside the application.
+     The scanned Form 102 remains visible here.
+     Print calibration does NOT affect this preview.
      ============================================================ */
 
   return (
@@ -937,13 +1203,6 @@ export default function BirthCertificatePreview({
       </FormPreviewContainer>
 
       <style jsx global>{`
-        /*
-         * SCREEN ONLY.
-         *
-         * Do NOT put physical print dimensions here.
-         * Printing is controlled by the page/global print CSS.
-         */
-
         .birth-certificate-preview {
           width: 100%;
         }
