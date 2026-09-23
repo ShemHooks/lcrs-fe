@@ -84,7 +84,7 @@ export interface BirthRegistrationData {
 
 export interface BirthRegistrationRecord {
   id: string;
-  registryNumber: string | null;
+  registryNumber?: string | null;
 
   address: any;
 
