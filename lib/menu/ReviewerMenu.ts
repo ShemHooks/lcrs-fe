@@ -31,6 +31,11 @@ export const ReviewerMenu = [
     path: "/reviewer/analytics",
     icon: BarChart3,
   },
+  {
+    name: "Reports",
+    path: "/reviewer/reports",
+    icon: Download,
+  },
 
   {
     name: "Settings",

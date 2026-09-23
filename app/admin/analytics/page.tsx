@@ -16,8 +16,14 @@ import BarList from "@/components/analytics/BarList";
 import AnalyticsSection from "@/components/analytics/AnalyticsSection";
 import MonthlyVolumeChart from "@/components/analytics/MonthlyVolumeChart";
 import AnalyticsShell from "@/components/analytics/AnalyticsShell";
+import AnalyticsWidgets from "@/components/analytics/AnalyticsWidgets";
+import ReportsPanel from "@/components/analytics/ReportsPanel";
 
-import { useAdminAnalytics, useSharedAnalytics } from "@/server/hooks/analyticsHooks";
+import {
+  useAdminAnalytics,
+  useSharedAnalytics,
+  useDashboardAnalytics,
+} from "@/server/hooks/analyticsHooks";
 
 const STATUS_COLORS: Record<string, string> = {
   Pending: "bg-amber-500",
@@ -40,6 +46,8 @@ export default function AdminAnalyticsPage() {
     refetch: sharedRefetch,
     isFetching: sharedFetching,
   } = useSharedAnalytics(year);
+
+  const { data: dashboard } = useDashboardAnalytics(year);
 
   return (
     <AnalyticsShell
@@ -145,6 +153,9 @@ export default function AdminAnalyticsPage() {
             </div>
           </AnalyticsSection>
 
+          {/* Per-type analytics widgets (plan: Analytics sidebar) */}
+          {dashboard && <AnalyticsWidgets data={dashboard} />}
+
           {/* Shared vital statistics */}
           <AnalyticsSection
             title="Vital Statistics"
@@ -225,6 +236,9 @@ export default function AdminAnalyticsPage() {
               />
             </div>
           </AnalyticsSection>
+
+          {/* Reports (plan: Reports sidebar) */}
+          <ReportsPanel year={year} />
         </>
       )}
     </AnalyticsShell>

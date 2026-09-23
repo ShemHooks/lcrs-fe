@@ -40,6 +40,11 @@ export const adminMenu = [
     path: "/admin/analytics",
     icon: BarChart3,
   },
+  {
+    name: "Reports",
+    path: "/admin/reports",
+    icon: Download,
+  },
   // {
   //   name: "Forms",
   //   path: "/admin/forms",
