@@ -17,14 +17,22 @@ import StatCard from "@/components/analytics/StatCard";
 import BarList from "@/components/analytics/BarList";
 import AnalyticsSection from "@/components/analytics/AnalyticsSection";
 import AnalyticsShell from "@/components/analytics/AnalyticsShell";
+import AnalyticsWidgets from "@/components/analytics/AnalyticsWidgets";
+import ReportsPanel from "@/components/analytics/ReportsPanel";
 
-import { useClerkAnalytics, useSharedAnalytics } from "@/server/hooks/analyticsHooks";
+import {
+  useClerkAnalytics,
+  useSharedAnalytics,
+  useDashboardAnalytics,
+} from "@/server/hooks/analyticsHooks";
 
 export default function ClerkAnalyticsPage() {
   const [year, setYear] = useState(new Date().getFullYear());
 
   const { data, isLoading, isError, error, refetch, isFetching } =
     useClerkAnalytics(year);
+
+  const { data: dashboard } = useDashboardAnalytics(year);
 
   const {
     data: shared,
@@ -144,6 +152,12 @@ export default function ClerkAnalyticsPage() {
               />
             </div>
           </AnalyticsSection>
+
+          {/* Per-type analytics widgets (plan: Analytics sidebar) */}
+          {dashboard && <AnalyticsWidgets data={dashboard} />}
+
+          {/* Reports (plan: Reports sidebar) */}
+          <ReportsPanel year={year} />
 
           <AnalyticsSection
             title="Vital Statistics"

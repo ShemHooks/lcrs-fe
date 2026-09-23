@@ -16,10 +16,13 @@ import StatCard from "@/components/analytics/StatCard";
 import BarList from "@/components/analytics/BarList";
 import AnalyticsSection from "@/components/analytics/AnalyticsSection";
 import AnalyticsShell from "@/components/analytics/AnalyticsShell";
+import AnalyticsWidgets from "@/components/analytics/AnalyticsWidgets";
+import ReportsPanel from "@/components/analytics/ReportsPanel";
 
 import {
   useReviewerAnalytics,
   useSharedAnalytics,
+  useDashboardAnalytics,
 } from "@/server/hooks/analyticsHooks";
 
 const formatDuration = (minutes: number | null) => {
@@ -38,6 +41,8 @@ export default function ReviewerAnalyticsPage() {
 
   const { data, isLoading, isError, error, refetch, isFetching } =
     useReviewerAnalytics(year);
+
+  const { data: dashboard } = useDashboardAnalytics(year);
 
   const {
     data: shared,
@@ -141,6 +146,12 @@ export default function ReviewerAnalyticsPage() {
               />
             </div>
           </AnalyticsSection>
+
+          {/* Per-type analytics widgets (plan: Analytics sidebar) */}
+          {dashboard && <AnalyticsWidgets data={dashboard} />}
+
+          {/* Reports (plan: Reports sidebar) */}
+          <ReportsPanel year={year} />
 
           <AnalyticsSection
             title="Vital Statistics"
