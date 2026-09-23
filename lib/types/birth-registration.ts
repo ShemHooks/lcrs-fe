@@ -16,7 +16,7 @@ export interface CertificateUserData {
 // ============================================================
 
 export interface BirthRegistrationData {
-  registryNumber: string;
+  registryNumber?: string;
   address: AddressValue;
 
   // child
